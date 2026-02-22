@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - Placement Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="auth-card">
+      <h1>Sign In</h1>
+      <p class="role-badge" id="selected-role-badge"></p>
+
+      <form id="signin-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required placeholder="Enter your password">
+        </div>
+        <button type="submit" class="btn-primary">Sign In</button>
+        <p class="auth-link">Don't have an account? <a href="#" id="switch-to-signup">Sign Up</a></p>
+        <p class="auth-link"><a href="index.html">← Back to Role Selection</a></p>
+      </form>
+
+      <div id="error-message" class="error-message"></div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const role = sessionStorage.getItem('selected_role');
+      if (!role) { window.location.href = 'index.html'; return; }
+
+      const names = { admin: '👨‍💼 Administrator', company: '🏢 Company', student: '🎓 Student' };
+      document.getElementById('selected-role-badge').textContent = names[role] || role;
+
+      document.getElementById('switch-to-signup').addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'sign-up.html';
+      });
+
+      document.getElementById('signin-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errEl = document.getElementById('error-message');
+        errEl.style.display = 'none';
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        if (!validateEmail(email)) { errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return; }
+        if (!validatePassword(password)) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display = 'block'; return; }
+
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.textContent = 'Signing In...';
+        btn.disabled = true;
+
+        const result = await auth.signIn(email, password, role);
+
+        if (result.success) {
+          if (result.role !== role) {
+            errEl.textContent = 'This account is registered as ' + result.role + ', not ' + role + '.';
+            errEl.style.display = 'block';
+            btn.textContent = 'Sign In'; btn.disabled = false;
+            return;
+          }
+          redirectToDashboard(result.role);
+        } else {
+          errEl.textContent = result.message || 'Sign in failed.';
+          errEl.style.display = 'block';
+          btn.textContent = 'Sign In'; btn.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

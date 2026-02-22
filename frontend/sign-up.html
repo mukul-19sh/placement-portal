@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - Placement Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="auth-card">
+      <h1>Sign Up</h1>
+      <p class="role-badge" id="selected-role-badge"></p>
+
+      <form id="signup-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required minlength="6" placeholder="Minimum 6 characters">
+        </div>
+        <div class="form-group">
+          <label for="confirm-password">Confirm Password</label>
+          <input type="password" id="confirm-password" required placeholder="Re-enter password">
+        </div>
+        <button type="submit" class="btn-primary">Sign Up</button>
+        <p class="auth-link">Already have an account? <a href="#" id="switch-to-signin">Sign In</a></p>
+        <p class="auth-link"><a href="index.html">← Back to Role Selection</a></p>
+      </form>
+
+      <div id="error-message" class="error-message"></div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const role = sessionStorage.getItem('selected_role');
+      if (!role) { window.location.href = 'index.html'; return; }
+
+      const names = { admin: '👨‍💼 Administrator', company: '🏢 Company', student: '🎓 Student' };
+      document.getElementById('selected-role-badge').textContent = names[role] || role;
+
+      document.getElementById('switch-to-signin').addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'sign-in.html';
+      });
+
+      document.getElementById('signup-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errEl = document.getElementById('error-message');
+        errEl.style.display = 'none';
+
+        const email = document.getElementById('email').value;
+        const pw = document.getElementById('password').value;
+        const cpw = document.getElementById('confirm-password').value;
+
+        if (!validateEmail(email)) { errEl.textContent = 'Please enter a valid email address.'; errEl.style.display = 'block'; return; }
+        if (!validatePassword(pw)) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display = 'block'; return; }
+        if (pw !== cpw) { errEl.textContent = 'Passwords do not match!'; errEl.style.display = 'block'; return; }
+
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.textContent = 'Creating Account...'; btn.disabled = true;
+        const reg = await auth.signUp(email, pw, role);
+
+        if (reg.success) {
+          const login = await auth.signIn(email, pw, role);
+          if (login.success) { redirectToDashboard(login.role); return; }
+          errEl.textContent = 'Account created! Please sign in.'; errEl.style.display = 'block';
+          setTimeout(() => { window.location.href = 'sign-in.html'; }, 1500);
+        } else {
+          errEl.textContent = reg.message; errEl.style.display = 'block';
+        }
+        btn.textContent = 'Sign Up'; btn.disabled = false;
+      });
+    });
+  </script>
+</body>
+</html>

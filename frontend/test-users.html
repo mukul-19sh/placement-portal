@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Test Users - Placement Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="auth-card">
+      <h1>Create Test Users</h1>
+      <p style="text-align:center;color:#666;margin-bottom:30px">Quickly create test accounts for each role</p>
+
+      <div style="margin-bottom:30px;padding:20px;background:#f8f9fa;border-radius:10px">
+        <h3 style="color:#667eea;margin-bottom:15px">👨‍💼 Administrator</h3>
+        <p><strong>Email:</strong> admin@test.com &nbsp; <strong>Password:</strong> admin123</p>
+        <button onclick="createUser('admin@test.com','admin123','admin')" class="btn-primary" style="margin-top:10px">Create Admin</button>
+        <div id="admin-result" style="margin-top:10px"></div>
+      </div>
+
+      <div style="margin-bottom:30px;padding:20px;background:#f8f9fa;border-radius:10px">
+        <h3 style="color:#667eea;margin-bottom:15px">🏢 Company</h3>
+        <p><strong>Email:</strong> company@test.com &nbsp; <strong>Password:</strong> company123</p>
+        <button onclick="createUser('company@test.com','company123','company')" class="btn-primary" style="margin-top:10px">Create Company</button>
+        <div id="company-result" style="margin-top:10px"></div>
+      </div>
+
+      <div style="margin-bottom:30px;padding:20px;background:#f8f9fa;border-radius:10px">
+        <h3 style="color:#667eea;margin-bottom:15px">🎓 Student</h3>
+        <p><strong>Email:</strong> student@test.com &nbsp; <strong>Password:</strong> student123</p>
+        <button onclick="createUser('student@test.com','student123','student')" class="btn-primary" style="margin-top:10px">Create Student</button>
+        <div id="student-result" style="margin-top:10px"></div>
+      </div>
+
+      <div style="text-align:center;margin-top:30px">
+        <a href="index.html" style="color:#667eea;text-decoration:none;font-weight:600">← Go to Login Page</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+    async function createUser(email, password, role) {
+      const el = document.getElementById(role + '-result');
+      el.innerHTML = '<p style="color:#667eea">Creating user...</p>';
+      try {
+        const res = await fetch(API_BASE + '/auth/register', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, role })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          el.innerHTML = '<p style="color:#28a745;font-weight:600">User created! You can now sign in.</p>';
+        } else if (data.detail && data.detail.includes('already')) {
+          el.innerHTML = '<p style="color:#ffc107;font-weight:600">User already exists. Use credentials to sign in.</p>';
+        } else {
+          el.innerHTML = '<p style="color:#dc3545;font-weight:600">Error: ' + (data.detail || 'Failed') + '</p>';
+        }
+      } catch (e) {
+        el.innerHTML = '<p style="color:#dc3545;font-weight:600">Error: ' + e.message + '</p><p style="font-size:0.9em;color:#666">Make sure backend is running at ' + API_BASE + '</p>';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Placement Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-content">
+      <h2>👨‍💼 Admin Dashboard</h2>
+      <div class="nav-actions">
+        <span id="user-email" class="user-info"></span>
+        <button id="logout-btn" class="btn-secondary">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="dashboard-header">
+      <h1>Placement Cell Management</h1>
+      <p>Manage students, jobs, and generate shortlists</p>
+      <div id="admin-stats" class="dashboard-stats"></div>
+    </div>
+
+    <div class="dashboard-tabs">
+      <button class="tab-btn active" data-tab="students">Students</button>
+      <button class="tab-btn" data-tab="jobs">Jobs</button>
+      <button class="tab-btn" data-tab="shortlist">Shortlist</button>
+    </div>
+
+    <div id="students-tab" class="tab-content active">
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3>Add Student</h3>
+          <form id="add-student-form">
+            <div class="form-group"><label>Name</label><input type="text" id="student-name" required></div>
+            <div class="form-group"><label>Skills (comma separated)</label><input type="text" id="student-skills" placeholder="Python, SQL, ML" required></div>
+            <div class="form-group"><label>CGPA</label><input type="number" id="student-cgpa" step="0.01" min="0" max="10" required></div>
+            <button type="submit" class="btn-primary">Add Student</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3>All Students</h3>
+          <button id="refresh-students" class="btn-secondary">Refresh</button>
+          <div id="students-list" class="list-container"><p class="loading">Loading students...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="jobs-tab" class="tab-content">
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3>Add Job</h3>
+          <form id="add-job-form">
+            <div class="form-group"><label>Title</label><input type="text" id="job-title" required></div>
+            <div class="form-group"><label>Required Skills (comma separated)</label><input type="text" id="job-skills" placeholder="Python, SQL" required></div>
+            <div class="form-group"><label>Minimum CGPA</label><input type="number" id="job-min-cgpa" step="0.01" min="0" max="10" required></div>
+            <div class="form-group"><label>Top N</label><input type="number" id="job-top-n" value="10" min="1" required></div>
+            <button type="submit" class="btn-primary">Add Job</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3>All Jobs</h3>
+          <button id="refresh-jobs" class="btn-secondary">Refresh</button>
+          <div id="jobs-list" class="list-container"><p class="loading">Loading jobs...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="shortlist-tab" class="tab-content">
+      <div class="card">
+        <h3>Generate Shortlist</h3>
+        <form id="shortlist-form">
+          <div class="form-group"><label>Select Job</label><select id="shortlist-job-select" required><option value="">Loading jobs...</option></select></div>
+          <button type="submit" class="btn-primary">Generate Shortlist</button>
+        </form>
+        <div id="shortlist-results" class="list-container"><p class="info">Select a job and click "Generate Shortlist"</p></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

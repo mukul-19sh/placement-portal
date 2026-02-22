@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Placement Portal - Select Role</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="role-selection-card">
+      <h1>Placement Portal</h1>
+      <p class="subtitle">Select your role to continue</p>
+
+      <div class="role-options">
+        <div class="role-card" data-role="admin">
+          <div class="role-icon">👨‍💼</div>
+          <h2>Administrator</h2>
+          <p>College Placement Cell</p>
+          <p class="role-description">Manage students, jobs, and generate shortlists</p>
+        </div>
+
+        <div class="role-card" data-role="company">
+          <div class="role-icon">🏢</div>
+          <h2>Company</h2>
+          <p>Recruiter</p>
+          <p class="role-description">Post jobs and view shortlisted candidates</p>
+        </div>
+
+        <div class="role-card" data-role="student">
+          <div class="role-icon">🎓</div>
+          <h2>Student</h2>
+          <p>Job Seeker</p>
+          <p class="role-description">Create profile, browse jobs, check shortlist</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.role-card').forEach(card => {
+      card.addEventListener('click', () => {
+        sessionStorage.setItem('selected_role', card.dataset.role);
+        window.location.href = 'sign-in.html';
+      });
+    });
+  </script>
+</body>
+</html>
