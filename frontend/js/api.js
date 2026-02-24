@@ -1,5 +1,5 @@
 // Fix 4: Single config constant -- change this when deploying
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://placement-portal-backend-mukul.onrender.com";
 
 const api = {
   register: (email, password, role) =>
