@@ -275,6 +275,356 @@ body {
   font-size: 0.9em;
 }
 
+/* Notification System */
+.notification-container {
+  position: relative;
+}
+
+.btn-notification {
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 1em;
+  position: relative;
+  transition: background 0.3s;
+}
+
+.btn-notification:hover {
+  background: #5a6fd8;
+}
+
+.notification-count {
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.75em;
+  margin-left: 5px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  width: 350px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+}
+
+.notification-dropdown.show {
+  display: block;
+}
+
+.notification-dropdown h4 {
+  margin: 0;
+  padding: 15px;
+  background: #667eea;
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+.notifications-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.notification-item:hover {
+  background: #f8f9fa;
+}
+
+.notification-item.unread {
+  background: #e3f2fd;
+  font-weight: 600;
+}
+
+.notification-item .notification-time {
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 5px;
+}
+
+.no-notifications {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.85em;
+  width: auto;
+  margin: 10px;
+  margin-top: 0;
+}
+
+/* Profile Completion */
+.profile-completion {
+  background: #e3f2fd;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.completion-percentage {
+  font-size: 2em;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 5px;
+}
+
+.completion-status {
+  color: #666;
+  font-weight: 600;
+}
+
+/* Match Percentage Badge */
+.match-badge {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 1.1em;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.match-badge.high {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.match-badge.medium {
+  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.match-badge.low {
+  background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+}
+
+/* AI Review Results */
+.ai-review-results {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.ai-review-results h4 {
+  color: #667eea;
+  margin-bottom: 15px;
+}
+
+.ai-section {
+  margin-bottom: 20px;
+}
+
+.ai-section h5 {
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.ai-section ul {
+  margin-left: 20px;
+  color: #666;
+}
+
+.ai-section li {
+  margin-bottom: 5px;
+}
+
+.ai-score {
+  font-size: 3em;
+  font-weight: 700;
+  color: #667eea;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.ai-score.excellent {
+  color: #28a745;
+}
+
+.ai-score.good {
+  color: #17a2b8;
+}
+
+.ai-score.fair {
+  color: #ffc107;
+}
+
+.ai-score.poor {
+  color: #dc3545;
+}
+
+/* Chatbot Styles */
+.chatbot-container {
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.chatbot-upload {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  background: #f8f9fa;
+}
+
+.chatbot-messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  background: white;
+}
+
+.chatbot-welcome {
+  margin-bottom: 15px;
+}
+
+.bot-message {
+  background: #e3f2fd;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border-left: 4px solid #667eea;
+}
+
+.bot-message ul {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.bot-message li {
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.user-message {
+  background: #667eea;
+  color: white;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  text-align: right;
+  margin-left: 20%;
+}
+
+.chatbot-input {
+  padding: 15px;
+  border-top: 1px solid #eee;
+  background: #f8f9fa;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.input-group input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.quick-questions p {
+  margin: 0 0 10px 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.quick-question-btn {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: white;
+  border: 1px solid #667eea;
+  border-radius: 4px;
+  color: #667eea;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+  transition: all 0.3s;
+}
+
+.quick-question-btn:hover {
+  background: #667eea;
+  color: white;
+}
+
+.chatbot-analysis {
+  background: #f0f8ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+}
+
+.chatbot-analysis h5 {
+  color: #0066cc;
+  margin-bottom: 10px;
+}
+
+.chatbot-analysis .skill-category {
+  margin-bottom: 10px;
+}
+
+.chatbot-analysis .skill-category strong {
+  color: #333;
+}
+
+.chatbot-analysis .skills-list {
+  background: white;
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+.chatbot-suggestions {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+}
+
+.chatbot-suggestions ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.chatbot-suggestions li {
+  margin-bottom: 8px;
+  color: #856404;
+}
+
 /* Dashboard */
 .dashboard-header {
   text-align: center;

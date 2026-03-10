@@ -7,6 +7,12 @@ class StudentCreate(BaseModel):
     skills: str
     cgpa: float
 
+
+class StudentProfile(BaseModel):
+    full_name: str
+    skills: str
+    cgpa: float
+
 class StudentBulkCreate(BaseModel):
     students: List[StudentCreate]
 

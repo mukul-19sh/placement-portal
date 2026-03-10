@@ -9,3 +9,7 @@ python-multipart
 psycopg2-binary
 python-dotenv
 gunicorn
+PyPDF2
+boto3
+cloudinary
+aiofiles

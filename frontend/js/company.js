@@ -98,6 +98,9 @@ function renderShortlist(data) {
   c.innerHTML = `<h4>Shortlist for: ${data.job}</h4>` + data.results.map((r, i) => `
     <div class="list-item">
       <div class="list-item-header"><strong>#${i + 1}. ${r.name}</strong><span class="badge badge-success">Score: ${Number(r.score || 0).toFixed(2)}</span></div>
-      <div class="list-item-body">CGPA: ${r.cgpa} | Skills: ${r.skills || "N/A"}</div>
+      <div class="list-item-body">
+        CGPA: ${r.cgpa} | Skills: ${r.skills || "N/A"}
+        ${r.resume_url ? ` | <a href="${r.resume_url}" target="_blank" rel="noopener noreferrer">View Resume</a>` : ""}
+      </div>
     </div>`).join("");
 }

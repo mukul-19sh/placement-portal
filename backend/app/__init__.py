@@ -1,0 +1,3 @@
+"""
+Placement Portal Backend Application
+"""

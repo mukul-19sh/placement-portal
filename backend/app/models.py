@@ -1,8 +1,8 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean
+from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime
+from datetime import datetime
 from .database import Base
 
 
-# ---------- Placement data (unchanged) ----------
 class Student(Base):
     """Student profiles for placement matching (name, skills, cgpa)."""
     __tablename__ = "students"
@@ -10,6 +10,8 @@ class Student(Base):
     name = Column(String, nullable=False)
     skills = Column(String, nullable=False)
     cgpa = Column(Float, nullable=False)
+    resume_url = Column(String, nullable=True)
+    owner_email = Column(String, nullable=True, index=True)
 
 
 class Job(Base):
@@ -30,6 +32,7 @@ class AdminUser(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
+    is_verified = Column(Boolean, default=False)
 
 
 class CompanyUser(Base):
@@ -39,6 +42,7 @@ class CompanyUser(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
+    is_verified = Column(Boolean, default=False)
 
 
 class StudentUser(Base):
@@ -48,3 +52,46 @@ class StudentUser(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
+    is_verified = Column(Boolean, default=False)
+
+
+class EmailVerificationToken(Base):
+    __tablename__ = "email_verification_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, index=True, nullable=False)
+    role = Column(String, nullable=False)
+    token = Column(String, unique=True, nullable=False, index=True)
+    expires_at = Column(DateTime, nullable=False)
+    used = Column(Boolean, default=False)
+
+
+class ProfileView(Base):
+    __tablename__ = "profile_views"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, index=True, nullable=False)
+    viewer_email = Column(String, nullable=False)
+    viewer_role = Column(String, nullable=False)
+    viewed_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_email = Column(String, index=True, nullable=False)
+    message = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    is_read = Column(Boolean, default=False)
+
+
+class JobApplication(Base):
+    __tablename__ = "job_applications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_email = Column(String, index=True, nullable=False)
+    job_id = Column(Integer, index=True, nullable=False)
+    applied_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    status = Column(String, default="pending")  # pending, reviewed, accepted, rejected
+    match_percentage = Column(Float, nullable=False)

@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
       btn.classList.add("active");
       document.getElementById(`${btn.dataset.tab}-tab`).classList.add("active");
+      if (btn.dataset.tab === "analytics") {
+        loadAnalytics();
+      }
     });
   });
 
@@ -81,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadStudents();
   loadJobs();
   loadJobsForShortlist();
+  loadAnalytics();
 });
 
 async function loadStats() {
@@ -139,6 +143,59 @@ function renderShortlist(data) {
   c.innerHTML = `<h4>Shortlist for: ${data.job}</h4>` + data.results.map((r, i) => `
     <div class="list-item">
       <div class="list-item-header"><strong>#${i + 1}. ${r.name}</strong><span class="badge badge-success">Score: ${Number(r.score || 0).toFixed(2)}</span></div>
-      <div class="list-item-body">CGPA: ${r.cgpa} | Skills: ${r.skills || "N/A"}</div>
+      <div class="list-item-body">
+        CGPA: ${r.cgpa} | Skills: ${r.skills || "N/A"}
+        ${r.resume_url ? ` | <a href="${r.resume_url}" target="_blank" rel="noopener noreferrer">View Resume</a>` : ""}
+      </div>
     </div>`).join("");
+}
+
+async function loadAnalytics() {
+  const cardsEl = document.getElementById("analytics-cards");
+  const listEl = document.getElementById("skills-list");
+  const chartCanvas = document.getElementById("skills-chart");
+  if (!cardsEl || !listEl || !chartCanvas) return;
+
+  try {
+    const a = await api.adminAnalytics();
+    cardsEl.innerHTML = `
+      <div class="stat-card"><span class="stat-value">${a.total_users ?? 0}</span><span class="stat-label">Total Users</span></div>
+      <div class="stat-card"><span class="stat-value">${a.total_students ?? 0}</span><span class="stat-label">Students</span></div>
+      <div class="stat-card"><span class="stat-value">${a.total_companies ?? 0}</span><span class="stat-label">Companies</span></div>
+      <div class="stat-card"><span class="stat-value">${a.total_jobs ?? 0}</span><span class="stat-label">Jobs</span></div>
+      <div class="stat-card"><span class="stat-value">${a.total_shortlists ?? 0}</span><span class="stat-label">Shortlist Matches</span></div>
+    `;
+
+    const skills = a.top_skills || [];
+    listEl.innerHTML = skills.length
+      ? skills.map(s => `<li>${s.skill} — ${s.count}</li>`).join("")
+      : "<li>No skill data yet.</li>";
+
+    if (window._skillsChart) {
+      window._skillsChart.destroy();
+    }
+    if (skills.length) {
+      const labels = skills.map(s => s.skill);
+      const data = skills.map(s => s.count);
+      window._skillsChart = new Chart(chartCanvas.getContext("2d"), {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [{
+            label: "Students with skill",
+            data,
+            backgroundColor: "rgba(102, 126, 234, 0.7)",
+          }],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+        },
+      });
+    }
+  } catch (e) {
+    cardsEl.innerHTML = `<p class="error">Error loading analytics: ${e.message}</p>`;
+    listEl.innerHTML = "";
+  }
 }

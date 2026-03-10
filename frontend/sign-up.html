@@ -38,6 +38,7 @@
   <script src="js/auth.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      wakeServer();
       const role = sessionStorage.getItem('selected_role');
       if (!role) { window.location.href = 'index.html'; return; }
 

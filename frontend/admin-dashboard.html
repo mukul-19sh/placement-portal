@@ -28,6 +28,7 @@
       <button class="tab-btn active" data-tab="students">Students</button>
       <button class="tab-btn" data-tab="jobs">Jobs</button>
       <button class="tab-btn" data-tab="shortlist">Shortlist</button>
+      <button class="tab-btn" data-tab="analytics">📊 Analytics</button>
     </div>
 
     <div id="students-tab" class="tab-content active">
@@ -79,8 +80,23 @@
         <div id="shortlist-results" class="list-container"><p class="info">Select a job and click "Generate Shortlist"</p></div>
       </div>
     </div>
+
+    <div id="analytics-tab" class="tab-content">
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3>Platform Overview</h3>
+          <div id="analytics-cards" class="dashboard-stats"></div>
+        </div>
+        <div class="card">
+          <h3>Top Skills</h3>
+          <canvas id="skills-chart" height="180"></canvas>
+          <ul id="skills-list" style="margin-top:15px;"></ul>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/admin.js"></script>

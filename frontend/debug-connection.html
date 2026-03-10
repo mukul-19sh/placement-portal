@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connection Debugger - Placement Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { border-left: 4px solid #28a745; }
+        .error { border-left: 4px solid #dc3545; }
+        .warning { border-left: 4px solid #ffc107; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #5a6fd8; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .log {
+            background: #212529;
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+        .log-time { color: #6c757d; }
+        .log-success { color: #28a745; }
+        .log-error { color: #dc3545; }
+        .log-info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Connection Debugger</h1>
+    <p>This page will help diagnose why frontend cannot connect to backend.</p>
+
+    <div class="test-card">
+        <h2>📍 Current Configuration</h2>
+        <div id="config-info"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>🔗 Test Connections</h2>
+        <button onclick="testHealth()">1. Test Backend Health</button>
+        <button onclick="testCORS()">2. Test CORS Preflight</button>
+        <button onclick="testLogin()">3. Test Login Endpoint</button>
+        <button onclick="testAll()">4. Run All Tests</button>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>📝 Connection Log</h2>
+        <div id="connection-log" class="log"></div>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <div class="test-card">
+        <h2>💡 Solutions</h2>
+        <div id="solutions"></div>
+    </div>
+
+    <script>
+        const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
+            ? "http://localhost:8000" 
+            : "https://placement-portal-backend-mukul.onrender.com";
+
+        let logEntries = [];
+
+        function log(message, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const entry = { time, message, type };
+            logEntries.push(entry);
+            
+            const logDiv = document.getElementById('connection-log');
+            const className = type === 'success' ? 'log-success' : type === 'error' ? 'log-error' : 'log-info';
+            logDiv.innerHTML += `<div class="log-entry"><span class="log-time">${time}</span> <span class="${className}">${message}</span></div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            logEntries = [];
+            document.getElementById('connection-log').innerHTML = '';
+        }
+
+        function showConfig() {
+            const config = `
+Protocol: ${window.location.protocol}
+Hostname: ${window.location.hostname}
+Port: ${window.location.port || '80'}
+API Base: ${API_BASE}
+Origin: ${window.location.origin}
+            `;
+            document.getElementById('config-info').innerHTML = `<pre>${config}</pre>`;
+            log('Configuration loaded', 'info');
+        }
+
+        async function testHealth() {
+            log('Testing backend health...', 'info');
+            try {
+                const response = await fetch(`${API_BASE}/health`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Health check PASSED: ${JSON.stringify(data)}`, 'success');
+                    return true;
+                } else {
+                    log(`❌ Health check FAILED: HTTP ${response.status}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Health check ERROR: ${error.message}`, 'error');
+                if (error.message.includes('Failed to fetch')) {
+                    log('💡 Backend is not running or blocked', 'info');
+                }
+                return false;
+            }
+        }
+
+        async function testCORS() {
+            log('Testing CORS preflight...', 'info');
+            try {
+                const response = await fetch(`${API_BASE}/health`, {
+                    method: 'OPTIONS',
+                    mode: 'cors',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                
+                log(`CORS preflight status: ${response.status}`, 'info');
+                
+                const allowOrigin = response.headers.get('Access-Control-Allow-Origin');
+                const allowMethods = response.headers.get('Access-Control-Allow-Methods');
+                
+                if (allowOrigin) {
+                    log(`✅ CORS Allow-Origin: ${allowOrigin}`, 'success');
+                } else {
+                    log(`⚠️ No CORS Allow-Origin header`, 'warning');
+                }
+                
+                if (allowMethods) {
+                    log(`✅ CORS Allow-Methods: ${allowMethods}`, 'success');
+                }
+                
+                return true;
+            } catch (error) {
+                log(`❌ CORS test ERROR: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testLogin() {
+            log('Testing login endpoint...', 'info');
+            try {
+                const form = new URLSearchParams();
+                form.append("username", "test@test.com");
+                form.append("password", "test123");
+                
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json'
+                    },
+                    body: form
+                });
+                
+                const data = await response.json();
+                
+                if (response.status === 401) {
+                    log(`✅ Login endpoint reachable (401 is expected for bad credentials)`, 'success');
+                    return true;
+                } else if (response.ok) {
+                    log(`✅ Login successful`, 'success');
+                    return true;
+                } else {
+                    log(`⚠️ Login returned: ${response.status} - ${JSON.stringify(data)}`, 'warning');
+                    return true;
+                }
+            } catch (error) {
+                log(`❌ Login test ERROR: ${error.message}`, 'error');
+                if (error.message.includes('Failed to fetch')) {
+                    log('💡 This confirms the connection issue', 'info');
+                }
+                return false;
+            }
+        }
+
+        async function testAll() {
+            clearLog();
+            log('Running all diagnostic tests...', 'info');
+            
+            const health = await testHealth();
+            await new Promise(r => setTimeout(r, 500));
+            
+            const cors = await testCORS();
+            await new Promise(r => setTimeout(r, 500));
+            
+            const login = await testLogin();
+            
+            showSolutions(health, cors, login);
+        }
+
+        function showSolutions(health, cors, login) {
+            let solutions = [];
+            
+            if (!health) {
+                solutions.push({
+                    title: 'Backend Not Running',
+                    steps: [
+                        'Open PowerShell',
+                        'cd "C:\Users\sharm\OneDrive\Desktop\placement-portal\backend"',
+                        'python run.py',
+                        'Keep the window open!'
+                    ]
+                });
+            }
+            
+            if (health && !login) {
+                solutions.push({
+                    title: 'CORS Blocking Requests',
+                    steps: [
+                        'Backend is running but CORS is blocking',
+                        'Stop backend (Ctrl+C in backend window)',
+                        'Restart with: python run.py',
+                        'Refresh this page and test again'
+                    ]
+                });
+            }
+            
+            if (!cors) {
+                solutions.push({
+                    title: 'CORS Headers Missing',
+                    steps: [
+                        'Check backend/app/main.py CORS settings',
+                        'Ensure allow_origins=["*"] is set',
+                        'Restart backend after changes'
+                    ]
+                });
+            }
+            
+            if (solutions.length === 0) {
+                solutions.push({
+                    title: 'All Tests Passed!',
+                    steps: [
+                        'Backend is running correctly',
+                        'CORS is working',
+                        'Try logging in now',
+                        'If still failing, check browser console (F12)'
+                    ]
+                });
+            }
+            
+            let html = '';
+            solutions.forEach(sol => {
+                html += `<div class="test-card ${sol.title.includes('Passed') ? 'success' : 'error'}">`;
+                html += `<h3>${sol.title}</h3>`;
+                html += '<ol>';
+                sol.steps.forEach(step => {
+                    html += `<li>${step}</li>`;
+                });
+                html += '</ol></div>';
+            });
+            
+            document.getElementById('solutions').innerHTML = html;
+        }
+
+        // Initialize
+        window.onload = function() {
+            showConfig();
+            log('Connection debugger loaded', 'info');
+            log(`API Base: ${API_BASE}`, 'info');
+        };
+    </script>
+</body>
+</html>

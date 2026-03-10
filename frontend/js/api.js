@@ -1,5 +1,20 @@
 // Fix 4: Single config constant -- change this when deploying
+// Always use Render URL as requested by the user.
 const API_BASE = "https://placement-portal-backend-mukul.onrender.com";
+
+// Console log for debugging
+console.log('API_BASE:', API_BASE);
+console.log('Protocol:', window.location.protocol);
+console.log('Hostname:', window.location.hostname);
+
+// Render free tier can sleep; ping it once on page load
+async function wakeServer() {
+  try {
+    await fetch(`${API_BASE}/`, { method: "GET" });
+  } catch (e) {
+    console.log("Server not responding:", e.message);
+  }
+}
 
 const api = {
   register: (email, password, role) =>
@@ -7,7 +22,7 @@ const api = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, role }),
-    }).then(handleResponse),
+    }).then(handleResponse).catch(handleNetworkError),
 
   login: (email, password, role) => {
     const form = new URLSearchParams();
@@ -20,7 +35,7 @@ const api = {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: form,
-    }).then(handleResponse);
+    }).then(handleResponse).catch(handleNetworkError);
   },
 
   getStudents: () => authFetch("/students/"),
@@ -35,9 +50,60 @@ const api = {
   adminDashboard: () => authFetch("/admin/dashboard"),
   companyDashboard: () => authFetch("/company/dashboard"),
   studentDashboard: () => authFetch("/student/dashboard"),
+  adminAnalytics: () => authFetch("/admin/analytics"),
 
   shortlist: (jobId) => authFetch(`/admin/shortlist/${jobId}`),
   companyShortlist: (jobId) => authFetch(`/company/shortlist/${jobId}`),
+
+  // Student profile endpoints
+  getStudentProfile: () => authFetch("/student/profile"),
+  createOrUpdateProfile: (data) => authFetch("/student/profile", {
+    method: "POST",
+    body: JSON.stringify(data)
+  }),
+  uploadResume: (file) => {
+    const token = localStorage.getItem("auth_token");
+    const form = new FormData();
+    form.append("file", file);
+    return fetch(`${API_BASE}/student/upload-resume`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    }).then(handleResponse);
+  },
+
+  // Matched jobs and applications
+  getMatchedJobs: () => authFetch("/student/matched-jobs"),
+  applyForJob: (jobId) => authFetch(`/student/apply/${jobId}`, { method: "POST" }),
+  getMyApplications: () => authFetch("/student/my-applications"),
+
+  // AI Resume Review
+  aiResumeReview: () => authFetch("/student/ai-resume-review", { method: "POST" }),
+
+  // Notifications
+  getNotifications: () => authFetch("/student/notifications"),
+  markNotificationRead: (id) => authFetch(`/student/notifications/${id}/read`, { method: "POST" }),
+  markAllNotificationsRead: () => authFetch("/student/notifications/mark-all-read", { method: "POST" }),
+
+  // Resume Chatbot
+  chatWithBot: (question) => authFetch("/chatbot/chat", {
+    method: "POST",
+    body: JSON.stringify({ question, has_resume: false })
+  }),
+  chatWithBotAndResume: (question, file) => {
+    const token = localStorage.getItem("auth_token");
+    const form = new FormData();
+    form.append("file", file);
+    form.append("chat_request", JSON.stringify({ question, has_resume: true }));
+
+    return fetch(`${API_BASE}/chatbot/chat-with-resume`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    }).then(handleResponse);
+  },
+  getResumeSuggestions: () => authFetch("/chatbot/suggestions"),
+  getSkillsAnalysis: () => authFetch("/chatbot/skills-analysis"),
 };
 
 // Fix 3: Token expiry shows alert before redirect
@@ -66,6 +132,13 @@ async function handleResponse(res) {
   const data = await res.json();
   if (!res.ok) throw new Error(data.detail || `Error ${res.status}`);
   return data;
+}
+
+function handleNetworkError(error) {
+  if (error.message === 'Failed to fetch') {
+    throw new Error('Cannot connect to server at ' + API_BASE + '. Make sure backend is running (python run.py in backend folder). Check browser console (F12) for details.');
+  }
+  throw error;
 }
 
 // Fix 5: Reusable form validation helpers
