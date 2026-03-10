@@ -21,6 +21,15 @@ body {
 }
 
 /* Landing Page Hero Section */
+.top-nav-text {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  font-size: 0.9em;
+  color: #666666;
+  font-weight: 500;
+}
+
 .hero-section {
   display: flex;
   flex-direction: column;
@@ -34,18 +43,48 @@ body {
   max-width: 800px;
 }
 
-.hero-content h1 {
-  font-size: 2.2em;
-  font-weight: 400;
+.hero-content .main-heading {
+  font-size: 1.25em;
+  color: #0a66c2;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.hero-content .sub-heading {
+  font-size: 2.8em;
+  font-weight: 700;
   color: #000000e6;
-  line-height: 1.4;
-  margin-bottom: 20px;
+  line-height: 1.25;
+  margin-bottom: 24px;
+}
+
+.hero-content .hero-description {
+  font-size: 1.15em;
+  color: #666666;
+  line-height: 1.6;
+  margin-bottom: 32px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hero-content .subtitle {
   font-size: 1.25em;
   color: #666666;
   font-weight: 500;
+}
+
+.footer-text {
+  text-align: center;
+  color: #666666;
+  font-size: 0.8em;
+  margin-top: 60px;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.6;
 }
 
 .role-options {
