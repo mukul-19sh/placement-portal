@@ -7,9 +7,11 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #f3f2ef;
+  /* LinkedIn light gray background */
   min-height: 100vh;
-  color: #333;
+  color: #000000e6;
+  /* Deep neutral for text */
 }
 
 .container {
@@ -18,99 +20,134 @@ body {
   padding: 20px;
 }
 
-/* Role Selection Page */
-.role-selection-card {
-  background: white;
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  margin-top: 50px;
+/* Landing Page Hero Section */
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 60px;
 }
 
-.role-selection-card h1 {
+.hero-content {
   text-align: center;
-  color: #667eea;
-  margin-bottom: 10px;
-  font-size: 2.5em;
-}
-
-.subtitle {
-  text-align: center;
-  color: #666;
   margin-bottom: 40px;
-  font-size: 1.1em;
+  max-width: 800px;
+}
+
+.hero-content h1 {
+  font-size: 2.2em;
+  font-weight: 400;
+  color: #000000e6;
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+
+.hero-content .subtitle {
+  font-size: 1.25em;
+  color: #666666;
+  font-weight: 500;
 }
 
 .role-options {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 30px;
-  margin-top: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  width: 100%;
+  max-width: 1000px;
 }
 
 .role-card {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border-radius: 15px;
-  padding: 30px;
+  background: white;
+  border-radius: 8px;
+  /* Sharper standard corners */
+  padding: 32px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  border: 3px solid transparent;
+  border: 1px solid #e0dfdc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* Subtle float */
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .role-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  border-color: #667eea;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #0a66c2;
+  /* LinkedIn Blue interaction */
 }
 
 .role-icon {
-  font-size: 4em;
-  margin-bottom: 15px;
+  font-size: 3.5em;
+  /* Slightly smaller for cleaner look */
+  margin-bottom: 20px;
 }
 
 .role-card h2 {
-  color: #333;
-  margin-bottom: 5px;
+  color: #000000e6;
+  margin-bottom: 8px;
   font-size: 1.5em;
+  font-weight: 600;
 }
 
 .role-card p {
-  color: #666;
-  margin: 5px 0;
+  color: #666666;
+  margin: 8px 0;
+  line-height: 1.5;
+  flex-grow: 1;
+  /* Pushes the portal link to the bottom */
 }
 
 .role-description {
-  font-size: 0.9em;
-  color: #888;
+  font-size: 1em;
+  /* Increased readability */
+  color: #666666;
   margin-top: 10px;
+}
+
+.portal-link {
+  display: inline-block;
+  margin-top: 24px;
+  color: #0a66c2;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.role-card:hover .portal-link {
+  text-decoration: underline;
 }
 
 /* Auth Pages */
 .auth-card {
   background: white;
-  border-radius: 20px;
+  border-radius: 8px;
   padding: 40px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* Minimal shadow */
   max-width: 450px;
   margin: 50px auto;
+  border: 1px solid #e0dfdc;
 }
 
 .auth-card h1 {
   text-align: center;
-  color: #667eea;
-  margin-bottom: 20px;
+  color: #000000e6;
+  margin-bottom: 24px;
+  font-weight: 600;
 }
 
 .role-badge {
-  display: block;
+  display: inline-block;
   text-align: center;
-  background: #667eea;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 25px;
-  margin-bottom: 30px;
+  background: #f3f2ef;
+  color: #000000e6;
+  padding: 6px 16px;
+  border-radius: 4px;
+  margin: 0 auto 30px auto;
   font-weight: 600;
+  font-size: 0.9em;
+  width: 100%;
 }
 
 .form-group {
@@ -120,54 +157,62 @@ body {
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #333;
-  font-weight: 500;
+  color: #000000e6;
+  font-weight: 600;
+  font-size: 0.95em;
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
   padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  border: 1px solid #00000099;
+  /* LinkedIn thicker input border */
+  border-radius: 4px;
   font-size: 1em;
-  transition: border-color 0.3s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   background: white;
-  color: #333;
+  color: #000000e6;
 }
 
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #0a66c2;
+  box-shadow: 0 0 0 1px #0a66c2;
+  /* Solid focus ring instead of glow */
 }
 
 .btn-primary {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: #0a66c2;
+  /* LinkedIn Blue */
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 28px;
+  /* LinkedIn rounded buttons */
   font-size: 1.1em;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, opacity 0.2s;
+  transition: background-color 0.2s;
   margin-top: 10px;
 }
 
 .btn-primary:hover {
-  transform: scale(1.02);
+  background-color: #004182;
+  /* Darker blue active */
+  transform: none;
+  /* Removed bounce for professional feel */
 }
 
 .btn-primary:active {
-  transform: scale(0.98);
+  background-color: #00305b;
 }
 
 .btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
 }
 
 .btn-secondary {
@@ -208,12 +253,13 @@ body {
 
 .auth-link {
   text-align: center;
-  margin-top: 20px;
-  color: #666;
+  margin-top: 24px;
+  color: #666666;
+  font-size: 0.95em;
 }
 
 .auth-link a {
-  color: #667eea;
+  color: #0a66c2;
   text-decoration: none;
   font-weight: 600;
 }
@@ -224,30 +270,39 @@ body {
 
 .error-message {
   display: none;
-  background: #f8d7da;
-  color: #721c24;
+  background: #fdeaea;
+  /* Softer red */
+  color: #c92f2f;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 4px;
+  /* Sharper corners */
   margin-top: 15px;
   text-align: center;
+  border: 1px solid #f6c0c0;
 }
 
 .success-message {
   display: none;
-  background: #d4edda;
-  color: #155724;
+  background: #edf7ed;
+  /* Softer green */
+  color: #1e4620;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 4px;
   margin-top: 15px;
   text-align: center;
+  border: 1px solid #c8e6c9;
 }
 
 /* Navbar */
 .navbar {
   background: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 15px 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  /* Minimal shadow for flat header */
+  padding: 12px 0;
   margin-bottom: 30px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .nav-content {
@@ -260,19 +315,23 @@ body {
 }
 
 .nav-content h2 {
-  color: #667eea;
+  color: #0a66c2;
+  /* LinkedIn Blue Logo */
   margin: 0;
+  font-weight: 700;
+  font-size: 1.4em;
 }
 
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
 }
 
 .user-info {
-  color: #666;
-  font-size: 0.9em;
+  color: #000000e6;
+  font-size: 0.95em;
+  font-weight: 500;
 }
 
 /* Notification System */
@@ -680,24 +739,24 @@ body {
 
 .tab-btn {
   padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: white;
+  color: #666666;
+  border: 1px solid #e0dfdc;
+  border-radius: 4px;
   cursor: pointer;
   font-size: 1em;
   font-weight: 600;
-  transition: all 0.3s;
+  transition: all 0.2s;
 }
 
 .tab-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #f3f2ef;
 }
 
 .tab-btn.active {
-  background: white;
-  color: #667eea;
-  border-color: white;
+  background: #0a66c2;
+  color: white;
+  border-color: #0a66c2;
 }
 
 .tab-content {
@@ -710,27 +769,38 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  gap: 30px;
+  gap: 24px;
 }
 
 .card {
   background: white;
-  border-radius: 15px;
-  padding: 25px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  /* Sharper */
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* Minimal shadow */
+  border: 1px solid #e0dfdc;
 }
 
 .card h3 {
-  color: #667eea;
+  color: #000000e6;
   margin-bottom: 20px;
-  font-size: 1.4em;
+  font-size: 1.25em;
+  font-weight: 600;
 }
 
 .list-container {
@@ -740,16 +810,19 @@ body {
 }
 
 .list-item {
-  background: #f8f9fa;
+  background: white;
   border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-left: 4px solid #667eea;
-  transition: transform 0.15s;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #e0dfdc;
+  border-left: 4px solid #0a66c2;
+  /* LinkedIn Blue accent */
+  transition: transform 0.1s;
 }
 
 .list-item:hover {
-  transform: translateX(3px);
+  transform: translateX(4px);
+  background: #f8f9fa;
 }
 
 .list-item-header {
@@ -762,12 +835,13 @@ body {
 }
 
 .list-item-body {
-  color: #666;
-  font-size: 0.9em;
+  color: #666666;
+  font-size: 0.95em;
+  line-height: 1.5;
 }
 
 .list-item-footer {
-  margin-top: 10px;
+  margin-top: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -775,10 +849,10 @@ body {
 }
 
 .badge {
-  background: #667eea;
-  color: white;
-  padding: 5px 12px;
-  border-radius: 20px;
+  background: #f3f2ef;
+  color: #000000e6;
+  padding: 4px 12px;
+  border-radius: 16px;
   font-size: 0.85em;
   font-weight: 600;
   white-space: nowrap;
@@ -833,7 +907,8 @@ body {
   font-size: 0.85em;
 }
 
-.loading, .info {
+.loading,
+.info {
   text-align: center;
   color: #666;
   padding: 20px;
