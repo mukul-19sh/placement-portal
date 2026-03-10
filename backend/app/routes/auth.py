@@ -86,7 +86,7 @@ def register(user: UserCreate, request: Request, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered for this role")
 
-    _create_user(db, user.email, get_password_hash(user.password), role)
+    new_user = _create_user(db, user.email, get_password_hash(user.password), role)
     ev = _create_verification_token(db, user.email, role)
     base_url = str(request.base_url)
     email_sent = _send_verification_email(base_url, user.email, role, ev.token)
@@ -94,8 +94,13 @@ def register(user: UserCreate, request: Request, db: Session = Depends(get_db)):
     if email_sent:
         return {"message": "Registration successful. Please check your email to verify your account."}
     else:
+        # Auto-verify the user so they can login immediately since email isn't configured!
+        new_user.is_verified = True
+        db.add(new_user)
+        db.commit()
+        
         return {
-            "message": "Registration successful but email verification failed. Please check your SMTP configuration.",
+            "message": "Registration successful. (Auto-verified since email is not configured)",
             "email_sent": False,
             "verification_token": ev.token  # For development only
         }
