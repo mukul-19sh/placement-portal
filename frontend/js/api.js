@@ -88,6 +88,10 @@ const api = {
   getMatchedJobs: () => authFetch("/student/matched-jobs"),
   applyForJob: (jobId) => authFetch(`/student/apply/${jobId}`, { method: "POST" }),
   getMyApplications: () => authFetch("/student/my-applications"),
+  respondToOffer: (offerId, action) => authFetch(`/student/offers/${offerId}/respond`, {
+    method: "POST",
+    body: JSON.stringify({ action })
+  }),
 
   // AI Resume Review
   aiResumeReview: () => authFetch("/student/ai-resume-review", { method: "POST" }),
@@ -96,6 +100,21 @@ const api = {
   getNotifications: () => authFetch("/student/notifications"),
   markNotificationRead: (id) => authFetch(`/student/notifications/${id}/read`, { method: "POST" }),
   markAllNotificationsRead: () => authFetch("/student/notifications/mark-all-read", { method: "POST" }),
+
+  // Company – applicant management
+  getJobApplicants: (jobId) => authFetch(`/company/applicants/${jobId}`),
+  updateApplicationStatus: (appId, status) => authFetch(`/company/application/${appId}/status`, {
+    method: "POST",
+    body: JSON.stringify({ status })
+  }),
+  scheduleInterview: (appId, data) => authFetch(`/company/application/${appId}/schedule-interview`, {
+    method: "POST",
+    body: JSON.stringify(data)
+  }),
+  sendOffer: (appId, data) => authFetch(`/company/application/${appId}/send-offer`, {
+    method: "POST",
+    body: JSON.stringify(data)
+  }),
 
   // Resume Chatbot
   chatWithBot: (question) => authFetch("/chatbot/chat", {

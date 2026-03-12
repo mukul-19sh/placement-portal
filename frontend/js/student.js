@@ -358,7 +358,7 @@ async function applyForJob(jobId) {
   try {
     const result = await api.applyForJob(jobId);
     alert(`Application submitted successfully! Match: ${result.match_percentage}%`);
-    loadApplications(); // Refresh applications list
+    loadApplications();
   } catch (err) {
     alert("Error applying for job: " + err.message);
   }
@@ -376,24 +376,105 @@ async function loadApplications() {
       return;
     }
 
+    const STATUS_COLOR = {
+      applied: "#1565c0",
+      under_review: "#f57f17",
+      shortlisted: "#2e7d32",
+      interview: "#6a1b9a",
+      rejected: "#c62828",
+      offer: "#1b5e20",
+      offer_accepted: "#1b5e20",
+      offer_rejected: "#c62828",
+    };
+    const STATUS_BG = {
+      applied: "#e3f2fd",
+      under_review: "#fff8e1",
+      shortlisted: "#e8f5e9",
+      interview: "#f3e5f5",
+      rejected: "#ffebee",
+      offer: "#e8f5e9",
+      offer_accepted: "#e8f5e9",
+      offer_rejected: "#ffebee",
+    };
+
     c.innerHTML = applications.map((app) => {
-      const statusClass = app.status === 'accepted' ? 'badge-success' :
-        app.status === 'rejected' ? 'badge-danger' : 'badge-warning';
-      return `<div class="list-item">
-        <div class="list-item-header">
-          <strong>${app.job_title}</strong>
-          <span class="badge ${statusClass}">${app.status}</span>
-        </div>
-        <div class="list-item-body">
-          <strong>Applied:</strong> ${new Date(app.applied_at).toLocaleDateString()}<br>
-          <strong>Match Percentage:</strong> ${app.match_percentage}%
-        </div>
-      </div>`;
+      const statusColor = STATUS_COLOR[app.status] || "#555";
+      const statusBg = STATUS_BG[app.status] || "#f5f5f5";
+      const statusBadge = `<span style="display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700;background:${statusBg};color:${statusColor};">${app.status_label || app.status}</span>`;
+
+      // Interview card
+      let interviewHtml = "";
+      if (app.interview) {
+        interviewHtml = `
+          <div style="background:#f3e5f5;border-left:4px solid #9c27b0;border-radius:8px;padding:10px 14px;margin-top:10px;font-size:13px;">
+            <strong>📅 Interview Details</strong><br>
+            Company: <strong>${app.company}</strong><br>
+            Date: <strong>${app.interview.date}</strong> &nbsp;|&nbsp; Time: <strong>${app.interview.time}</strong><br>
+            Mode: <strong>${app.interview.mode}</strong>
+            ${app.interview.link ? `&nbsp;|&nbsp; <a href="${app.interview.link}" target="_blank" style="color:#6a1b9a;">Join Meeting 🔗</a>` : ""}
+            ${app.interview.notes ? `<br>Notes: ${app.interview.notes}` : ""}
+          </div>`;
+      }
+
+      // Offer card
+      let offerHtml = "";
+      if (app.offer && app.offer.status === "pending") {
+        offerHtml = `
+          <div style="background:#e8f5e9;border:2px solid #4caf50;border-radius:10px;padding:14px;margin-top:10px;">
+            <div style="font-size:16px;font-weight:700;margin-bottom:8px;">🎉 Offer Received!</div>
+            <div style="font-size:14px;">
+              <strong>Company:</strong> ${app.offer.company}<br>
+              <strong>Position:</strong> ${app.offer.position}<br>
+              <strong>CTC:</strong> ${app.offer.ctc}
+            </div>
+            <div style="margin-top:10px;display:flex;gap:10px;">
+              <button onclick="respondOffer(${app.offer.id}, 'accept')" style="padding:8px 18px;background:#4caf50;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">✅ Accept</button>
+              <button onclick="respondOffer(${app.offer.id}, 'reject')" style="padding:8px 18px;background:#f44336;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;">❌ Reject</button>
+            </div>
+          </div>`;
+      } else if (app.offer && app.offer.status !== "pending") {
+        const offerColor = app.offer.status === "accepted" ? "#2e7d32" : "#c62828";
+        const offerIcon = app.offer.status === "accepted" ? "✅ Accepted" : "❌ Rejected";
+        offerHtml = `
+          <div style="background:#f5f5f5;border-radius:8px;padding:10px 14px;margin-top:10px;font-size:13px;">
+            🎉 Offer from <strong>${app.offer.company}</strong> — ${app.offer.position} (${app.offer.ctc})
+            <span style="color:${offerColor};font-weight:700;margin-left:6px;">${offerIcon}</span>
+          </div>`;
+      }
+
+      return `
+        <div style="border:1px solid #e0e0e0;border-radius:12px;padding:16px;margin:12px 0;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+            <div>
+              <div style="font-weight:700;font-size:16px;">${app.job_title}</div>
+              <div style="color:#666;font-size:13px;">${app.company}</div>
+            </div>
+            ${statusBadge}
+          </div>
+          <div style="font-size:12px;color:#888;">
+            Applied: ${new Date(app.applied_at).toLocaleDateString()} &nbsp;|&nbsp; Match: <strong>${app.match_percentage}%</strong>
+          </div>
+          ${interviewHtml}
+          ${offerHtml}
+        </div>`;
     }).join("");
   } catch (e) {
     c.innerHTML = `<p class="error">Error: ${e.message}</p>`;
   }
 }
+
+async function respondOffer(offerId, action) {
+  const label = action === "accept" ? "accept" : "reject";
+  if (!confirm(`Are you sure you want to ${label} this offer?`)) return;
+  try {
+    const res = await api.respondToOffer(offerId, action);
+    alert(res.message || `Offer ${label}ed.`);
+    loadApplications();
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+}
+
 
 async function startAIReview() {
   const resultsEl = document.getElementById("ai-review-results");

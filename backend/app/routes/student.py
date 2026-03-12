@@ -1,11 +1,12 @@
 import shutil
 from pathlib import Path
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile, status, Query
 from sqlalchemy.orm import Session
 from typing import Optional
+from pydantic import BaseModel
 
 from ..deps import student_required, get_db
-from ..models import Job, Student, Notification, ProfileView, JobApplication
+from ..models import Job, Student, Notification, ProfileView, JobApplication, Interview, Offer, CompanyProfile
 from ..schemas import StudentProfile
 from ..matching import score_student_for_job
 from ..utils.storage import storage_manager
@@ -383,25 +384,111 @@ def get_my_applications(
     student=Depends(student_required),
     db: Session = Depends(get_db)
 ):
-    """Get all applications made by the student."""
+    """Get all applications made by the student with full detail."""
     applications = db.query(JobApplication).filter(
         JobApplication.student_email == student.email
-    ).all()
-    
+    ).order_by(JobApplication.applied_at.desc()).all()
+
+    STATUS_LABELS = {
+        "applied":      "📋 Applied",
+        "under_review": "🔍 Under Review",
+        "shortlisted":  "⭐ Shortlisted",
+        "interview":    "📅 Interview Scheduled",
+        "rejected":     "❌ Rejected",
+        "offer":        "🎉 Offer Received",
+    }
+
     result = []
     for app in applications:
         job = db.query(Job).filter(Job.id == app.job_id).first()
-        if job:
-            result.append({
-                "application_id": app.id,
-                "job_id": job.id,
-                "job_title": job.title,
-                "applied_at": app.applied_at.isoformat(),
-                "status": app.status,
-                "match_percentage": app.match_percentage
-            })
-    
+        if not job:
+            continue
+
+        # Company name
+        company_profile = db.query(CompanyProfile).filter(CompanyProfile.owner_email == job.created_by).first()
+        company_name = company_profile.company_name if company_profile else (job.created_by or "Company")
+
+        # Interview details
+        interview = db.query(Interview).filter(Interview.application_id == app.id).first()
+        interview_info = None
+        if interview:
+            interview_info = {
+                "date": interview.interview_date,
+                "time": interview.interview_time,
+                "mode": interview.mode,
+                "link": interview.link,
+                "notes": interview.notes,
+            }
+
+        # Offer details
+        offer = db.query(Offer).filter(Offer.application_id == app.id).first()
+        offer_info = None
+        if offer:
+            offer_info = {
+                "id": offer.id,
+                "position": offer.position,
+                "ctc": offer.ctc,
+                "status": offer.status,
+                "company": company_name,
+            }
+
+        result.append({
+            "application_id": app.id,
+            "job_id": job.id,
+            "job_title": job.title,
+            "company": company_name,
+            "applied_at": app.applied_at.isoformat(),
+            "status": app.status,
+            "status_label": STATUS_LABELS.get(app.status, app.status),
+            "match_percentage": app.match_percentage,
+            "interview": interview_info,
+            "offer": offer_info,
+        })
+
     return {"applications": result}
+
+
+class OfferResponse(BaseModel):
+    action: str  # "accept" | "reject"
+
+
+@router.post("/offers/{offer_id}/respond")
+def respond_to_offer(
+    offer_id: int,
+    body: OfferResponse,
+    student=Depends(student_required),
+    db: Session = Depends(get_db)
+):
+    """Student accepts or rejects a job offer."""
+    if body.action not in ("accept", "reject"):
+        raise HTTPException(status_code=400, detail="action must be 'accept' or 'reject'")
+
+    offer = db.query(Offer).filter(
+        Offer.id == offer_id,
+        Offer.student_email == student.email
+    ).first()
+    if not offer:
+        raise HTTPException(status_code=404, detail="Offer not found")
+
+    if offer.status != "pending":
+        raise HTTPException(status_code=400, detail="Offer already responded to")
+
+    offer.status = body.action + "ed"  # "accepted" or "rejected"
+
+    # Find the application and update its status
+    app = db.query(JobApplication).filter(JobApplication.id == offer.application_id).first()
+    if app:
+        app.status = "offer_" + body.action + "ed"  # offer_accepted / offer_rejected
+
+    # Notify the student themselves
+    action_label = "accepted 🎉" if body.action == "accept" else "rejected"
+    db.add(Notification(
+        student_email=student.email,
+        message=f"You {action_label} the offer for {offer.position} at {offer.company_email}"
+    ))
+
+    db.commit()
+    return {"message": f"Offer {action_label}", "offer_id": offer_id, "new_status": offer.status}
 
 
 @router.post("/ai-resume-review")

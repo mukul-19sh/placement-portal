@@ -6,6 +6,173 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Company Dashboard - Placement Portal</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-applied {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .status-under_review {
+      background: #fff8e1;
+      color: #f57f17;
+    }
+
+    .status-shortlisted {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .status-interview {
+      background: #f3e5f5;
+      color: #6a1b9a;
+    }
+
+    .status-rejected {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .status-offer {
+      background: #e8f5e9;
+      color: #1b5e20;
+    }
+
+    .applicant-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 16px;
+      margin: 12px 0;
+      background: #fff;
+    }
+
+    .applicant-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .btn-xs {
+      padding: 5px 12px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-shortlist {
+      background: #4caf50;
+      color: #fff;
+    }
+
+    .btn-review {
+      background: #2196f3;
+      color: #fff;
+    }
+
+    .btn-reject {
+      background: #f44336;
+      color: #fff;
+    }
+
+    .btn-interview {
+      background: #9c27b0;
+      color: #fff;
+    }
+
+    .btn-offer {
+      background: #ff9800;
+      color: #fff;
+    }
+
+    .btn-xs:hover {
+      opacity: 0.85;
+      transform: scale(1.02);
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px;
+      width: 90%;
+      max-width: 480px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    }
+
+    .modal-box h3 {
+      margin-bottom: 16px;
+    }
+
+    .modal-box .form-group {
+      margin-bottom: 12px;
+    }
+
+    .modal-box label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    .modal-box input,
+    .modal-box select,
+    .modal-box textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .modal-close {
+      float: right;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #888;
+    }
+
+    .job-applicant-select {
+      padding: 8px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      width: 100%;
+      max-width: 320px;
+    }
+  </style>
 </head>
 
 <body>
@@ -22,33 +189,19 @@
   <div class="container">
     <div class="dashboard-header">
       <h1>Job Posting & Management</h1>
-      <p>Post jobs, view listings, and see shortlisted candidates</p>
+      <p>Post jobs, manage applicants, schedule interviews and send offers</p>
       <div id="company-stats" class="dashboard-stats"></div>
     </div>
 
     <div class="dashboard-tabs">
       <button class="tab-btn active" data-tab="post-job">Post Job</button>
       <button class="tab-btn" data-tab="my-jobs">My Jobs</button>
-      <button class="tab-btn" data-tab="shortlist">Shortlisted Candidates</button>
+      <button class="tab-btn" data-tab="applicants">Applicants</button>
+      <button class="tab-btn" data-tab="shortlist">Shortlist Tool</button>
       <button class="tab-btn" data-tab="company-profile">Company Profile</button>
     </div>
 
-    <div id="company-profile-tab" class="tab-content">
-      <div class="card">
-        <h3>Company Profile</h3>
-        <form id="company-profile-form">
-          <div class="form-group"><label>Company Name</label><input type="text" id="profile-company-name" required
-              placeholder="e.g., XYZ Company"></div>
-          <div class="form-group"><label>Your Name</label><input type="text" id="profile-manager-name" required
-              placeholder="e.g., John Doe"></div>
-          <div class="form-group"><label>Designation</label><input type="text" id="profile-designation" required
-              placeholder="e.g., CEO, HR Manager"></div>
-          <button type="submit" class="btn-primary">Save Profile</button>
-        </form>
-        <div id="company-profile-message" style="margin-top: 10px; font-weight: bold;"></div>
-      </div>
-    </div>
-
+    <!-- Post Job -->
     <div id="post-job-tab" class="tab-content active">
       <div class="card">
         <h3>Create New Job Posting</h3>
@@ -66,6 +219,7 @@
       </div>
     </div>
 
+    <!-- My Jobs -->
     <div id="my-jobs-tab" class="tab-content">
       <div class="card">
         <h3>My Posted Jobs</h3>
@@ -76,19 +230,94 @@
       </div>
     </div>
 
+    <!-- Applicants -->
+    <div id="applicants-tab" class="tab-content">
+      <div class="card">
+        <h3>👥 Manage Applicants</h3>
+        <div style="margin-bottom:16px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <select id="applicant-job-select" class="job-applicant-select">
+            <option value="">— Select a job to view applicants —</option>
+          </select>
+          <button id="load-applicants-btn" class="btn-primary btn-sm">Load Applicants</button>
+        </div>
+        <div id="applicants-list" class="list-container">
+          <p class="info">Select a job above to see applicants.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shortlist Tool -->
     <div id="shortlist-tab" class="tab-content">
       <div class="card">
-        <h3>View Shortlisted Candidates</h3>
+        <h3>Auto-Shortlist by Score</h3>
         <form id="shortlist-form">
-          <div class="form-group"><label>Select Job</label><select id="shortlist-job-select" required>
+          <div class="form-group"><label>Select Job</label>
+            <select id="shortlist-job-select" required>
               <option value="">Loading jobs...</option>
-            </select></div>
-          <button type="submit" class="btn-primary">View Shortlist</button>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary">Generate Shortlist</button>
         </form>
         <div id="shortlist-results" class="list-container">
           <p class="info">Select a job to see shortlisted candidates</p>
         </div>
       </div>
+    </div>
+
+    <!-- Company Profile -->
+    <div id="company-profile-tab" class="tab-content">
+      <div class="card">
+        <h3>Company Profile</h3>
+        <form id="company-profile-form">
+          <div class="form-group"><label>Company Name</label><input type="text" id="profile-company-name" required
+              placeholder="e.g., XYZ Company"></div>
+          <div class="form-group"><label>Your Name</label><input type="text" id="profile-manager-name" required
+              placeholder="e.g., John Doe"></div>
+          <div class="form-group"><label>Designation</label><input type="text" id="profile-designation" required
+              placeholder="e.g., CEO, HR Manager"></div>
+          <button type="submit" class="btn-primary">Save Profile</button>
+        </form>
+        <div id="company-profile-message" style="margin-top:10px; font-weight:bold;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interview Modal -->
+  <div id="interview-modal" class="modal-overlay">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('interview-modal')">✕</button>
+      <h3>📅 Schedule Interview</h3>
+      <input type="hidden" id="interview-app-id">
+      <div class="form-group"><label>Date</label><input type="date" id="interview-date" required></div>
+      <div class="form-group"><label>Time</label><input type="time" id="interview-time" required></div>
+      <div class="form-group"><label>Mode</label>
+        <select id="interview-mode">
+          <option>Google Meet</option>
+          <option>Zoom</option>
+          <option>Microsoft Teams</option>
+          <option>In-Person</option>
+          <option>Phone Call</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Meeting Link (optional)</label><input type="url" id="interview-link"
+          placeholder="https://meet.google.com/..."></div>
+      <div class="form-group"><label>Notes (optional)</label><textarea id="interview-notes" rows="2"
+          placeholder="Any additional information..."></textarea></div>
+      <button class="btn-primary" onclick="submitInterview()">Schedule Interview</button>
+    </div>
+  </div>
+
+  <!-- Offer Modal -->
+  <div id="offer-modal" class="modal-overlay">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('offer-modal')">✕</button>
+      <h3>🎉 Send Job Offer</h3>
+      <input type="hidden" id="offer-app-id">
+      <div class="form-group"><label>Position / Role</label><input type="text" id="offer-position"
+          placeholder="e.g., Backend Developer" required></div>
+      <div class="form-group"><label>CTC (Cost to Company)</label><input type="text" id="offer-ctc"
+          placeholder="e.g., 10 LPA" required></div>
+      <button class="btn-primary" onclick="submitOffer()">Send Offer</button>
     </div>
   </div>
 
