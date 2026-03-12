@@ -6,7 +6,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ..deps import admin_required, get_db
-from ..models import Student, Job, AdminUser, CompanyUser, StudentUser, ProfileView, Notification
+from ..models import Student, Job, AdminUser, CompanyUser, StudentUser, ProfileView, Notification, AdminNotification
 from ..matching import score_student_for_job
 from ..utils.database_cleanup import run_full_cleanup
 from ..utils.email import send_email
@@ -301,4 +301,49 @@ def cleanup_database(admin=Depends(admin_required), db: Session = Depends(get_db
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Cleanup failed: {str(e)}")
+
+@router.get("/notifications")
+def admin_notifications(admin=Depends(admin_required), db: Session = Depends(get_db)):
+    """Get all notifications for admins."""
+    notifs = (
+        db.query(AdminNotification)
+        .filter((AdminNotification.admin_email == admin.email) | (AdminNotification.admin_email == None))
+        .order_by(AdminNotification.created_at.desc())
+        .all()
+    )
+    return [
+        {
+            "id": n.id,
+            "message": n.message,
+            "created_at": n.created_at.isoformat(),
+            "is_read": n.is_read,
+        }
+        for n in notifs
+    ]
+
+@router.post("/notifications/mark-all-read")
+def mark_all_admin_notifications_read(admin=Depends(admin_required), db: Session = Depends(get_db)):
+    """Mark all admin notifications as read."""
+    db.query(AdminNotification).filter(
+        (AdminNotification.admin_email == admin.email) | (AdminNotification.admin_email == None),
+        AdminNotification.is_read == False
+    ).update({"is_read": True})
+    db.commit()
+    return {"message": "All notifications marked as read"}
+
+@router.post("/notifications/{notification_id}/read")
+def mark_admin_notification_read(notification_id: int, admin=Depends(admin_required), db: Session = Depends(get_db)):
+    """Mark specific admin notification as read."""
+    notification = db.query(AdminNotification).filter(
+        AdminNotification.id == notification_id,
+        (AdminNotification.admin_email == admin.email) | (AdminNotification.admin_email == None)
+    ).first()
+    
+    if not notification:
+        raise HTTPException(status_code=404, detail="Notification not found")
+        
+    notification.is_read = True
+    db.commit()
+    return {"message": "Notification marked as read"}
+
 

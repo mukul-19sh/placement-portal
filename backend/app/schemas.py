@@ -32,3 +32,19 @@ class UserCreate(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+# ---------- Company ----------
+class CompanyProfileBase(BaseModel):
+    company_name: str
+    manager_name: str
+    designation: str
+
+class CompanyProfileCreate(CompanyProfileBase):
+    pass
+
+class CompanyProfileResponse(CompanyProfileBase):
+    id: int
+    owner_email: EmailStr
+
+    class Config:
+        orm_mode = True

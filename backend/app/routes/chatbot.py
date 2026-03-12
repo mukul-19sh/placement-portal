@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Optional
+import json
 
 from ..deps import student_required, get_db
 from ..models import Student
@@ -58,18 +59,34 @@ def chat_with_resume_bot(
         raise HTTPException(status_code=500, detail=f"Chatbot error: {str(e)}")
 
 
-@router.post("/chat-with-resume", response_model=ChatResponse)
+@router.post("/chat-with-resume")
 def chat_with_resume_analysis(
-    chat_request: ChatRequest,
     file: UploadFile = File(...),
+    chat_request: Optional[str] = Form(None),
+    question: Optional[str] = Form(None),
     student=Depends(student_required),
     db: Session = Depends(get_db)
 ):
     """
     Chat with AI resume review bot using uploaded resume for analysis.
     """
-    # Validate file
-    if file.content_type != "application/pdf":
+    # Parse question from chat_request JSON, direct question field, or use default
+    resolved_question = 'Analyze my resume'
+    if chat_request:
+        try:
+            req_data = json.loads(chat_request)
+            resolved_question = req_data.get('question', resolved_question)
+        except Exception:
+            resolved_question = chat_request  # treat as raw string
+    elif question:
+        resolved_question = question
+    # Validate file - check content_type OR filename extension (browsers may send octet-stream)
+    filename = file.filename or ""
+    is_pdf = (
+        file.content_type in ("application/pdf", "application/octet-stream", "binary/octet-stream")
+        or filename.lower().endswith(".pdf")
+    )
+    if not is_pdf:
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
     
     if file.size and file.size > 2 * 1024 * 1024:  # 2MB limit
@@ -94,7 +111,7 @@ def chat_with_resume_analysis(
         
         # Get chatbot response with resume analysis
         response = resume_chatbot.chat_with_resume(
-            question=chat_request.question,
+            question=resolved_question,
             pdf_content=pdf_content,
             profile_data=profile_data
         )

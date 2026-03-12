@@ -2,7 +2,8 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..deps import company_required, get_db
-from ..models import Job, Student, StudentUser, ProfileView, Notification
+from ..models import Job, Student, StudentUser, ProfileView, Notification, CompanyProfile
+from ..schemas import CompanyProfileCreate, CompanyProfileResponse
 from ..matching import score_student_for_job
 from ..utils.email import send_email
 
@@ -11,6 +12,9 @@ router = APIRouter(prefix="/company", tags=["Company"])
 
 @router.get("/dashboard")
 def company_dashboard(company=Depends(company_required), db: Session = Depends(get_db)):
+    profile = db.query(CompanyProfile).filter(CompanyProfile.owner_email == company.email).first()
+    company_name = profile.company_name if profile else "Company"
+    
     my_jobs = db.query(Job).filter(Job.created_by == company.email).count()
     total_jobs = db.query(Job).count()
     return {
@@ -26,6 +30,43 @@ def company_dashboard(company=Depends(company_required), db: Session = Depends(g
 @router.get("/my-jobs")
 def get_my_jobs(company=Depends(company_required), db: Session = Depends(get_db)):
     return db.query(Job).filter(Job.created_by == company.email).all()
+
+
+@router.get("/profile", response_model=CompanyProfileResponse)
+def get_company_profile(company=Depends(company_required), db: Session = Depends(get_db)):
+    """Get the current company's profile."""
+    profile = db.query(CompanyProfile).filter(CompanyProfile.owner_email == company.email).first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    return profile
+
+
+@router.post("/profile", response_model=CompanyProfileResponse)
+def create_or_update_company_profile(
+    profile_data: CompanyProfileCreate,
+    company=Depends(company_required),
+    db: Session = Depends(get_db)
+):
+    """Create or update company profile."""
+    profile = db.query(CompanyProfile).filter(CompanyProfile.owner_email == company.email).first()
+    
+    if profile:
+        profile.company_name = profile_data.company_name
+        profile.manager_name = profile_data.manager_name
+        profile.designation = profile_data.designation
+    else:
+        profile = CompanyProfile(
+            owner_email=company.email,
+            company_name=profile_data.company_name,
+            manager_name=profile_data.manager_name,
+            designation=profile_data.designation
+        )
+        db.add(profile)
+        
+    db.commit()
+    db.refresh(profile)
+    return profile
+
 
 
 @router.get("/shortlist/{job_id}")

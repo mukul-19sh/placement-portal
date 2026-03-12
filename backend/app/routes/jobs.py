@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 
 from ..database import SessionLocal
-from ..models import Job, StudentUser
+from ..models import Job, StudentUser, AdminNotification, Notification, CompanyProfile
 from ..schemas import JobCreate
 from ..deps import get_current_user
 from ..utils.email import send_email
@@ -31,19 +31,37 @@ def add_job(
     db.commit()
     db.refresh(new_job)
 
+    # Get Company Profile to include company name
+    profile = db.query(CompanyProfile).filter(CompanyProfile.owner_email == user.email).first()
+    company_name = profile.company_name if profile else user.email
+
     # Notify all student users about new job (non-blocking)
     students = db.query(StudentUser).all()
     if students:
-        subject = f"New job posted: {new_job.title}"
+        subject = f"New job posted: {new_job.title} by {company_name}"
         html = f"""
         <h2>New Job Posted</h2>
         <p><strong>Title:</strong> {new_job.title}</p>
-        <p><strong>Posted by:</strong> {user.email}</p>
+        <p><strong>Company:</strong> {company_name}</p>
         <p><strong>Min CGPA:</strong> {new_job.min_cgpa}</p>
         <p><strong>Required Skills:</strong> {new_job.requirements}</p>
         """
         for s in students:
+            # Send Email
             background_tasks.add_task(send_email, s.email, subject, html)
+            # Add In-App Notification
+            db.add(Notification(
+                student_email=s.email,
+                message=f"{company_name} opened {new_job.title} vacancies"
+            ))
+
+    # Notify admins about the new job
+    db.add(AdminNotification(
+        admin_email=None, # Global admin notification
+        message=f"{company_name} opened {new_job.title} vacancies"
+    ))
+
+    db.commit()
 
     return new_job
 

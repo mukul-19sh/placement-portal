@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Company Dashboard - Placement Portal</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
   <nav class="navbar">
     <div class="nav-content">
@@ -28,16 +30,37 @@
       <button class="tab-btn active" data-tab="post-job">Post Job</button>
       <button class="tab-btn" data-tab="my-jobs">My Jobs</button>
       <button class="tab-btn" data-tab="shortlist">Shortlisted Candidates</button>
+      <button class="tab-btn" data-tab="company-profile">Company Profile</button>
+    </div>
+
+    <div id="company-profile-tab" class="tab-content">
+      <div class="card">
+        <h3>Company Profile</h3>
+        <form id="company-profile-form">
+          <div class="form-group"><label>Company Name</label><input type="text" id="profile-company-name" required
+              placeholder="e.g., XYZ Company"></div>
+          <div class="form-group"><label>Your Name</label><input type="text" id="profile-manager-name" required
+              placeholder="e.g., John Doe"></div>
+          <div class="form-group"><label>Designation</label><input type="text" id="profile-designation" required
+              placeholder="e.g., CEO, HR Manager"></div>
+          <button type="submit" class="btn-primary">Save Profile</button>
+        </form>
+        <div id="company-profile-message" style="margin-top: 10px; font-weight: bold;"></div>
+      </div>
     </div>
 
     <div id="post-job-tab" class="tab-content active">
       <div class="card">
         <h3>Create New Job Posting</h3>
         <form id="post-job-form">
-          <div class="form-group"><label>Job Title</label><input type="text" id="job-title" required placeholder="e.g., Software Engineer"></div>
-          <div class="form-group"><label>Required Skills (comma separated)</label><input type="text" id="job-skills" placeholder="Python, SQL, JavaScript" required></div>
-          <div class="form-group"><label>Minimum CGPA Required</label><input type="number" id="job-min-cgpa" step="0.01" min="0" max="10" required></div>
-          <div class="form-group"><label>Top N Candidates</label><input type="number" id="job-top-n" value="10" min="1" required></div>
+          <div class="form-group"><label>Job Title</label><input type="text" id="job-title" required
+              placeholder="e.g., Software Engineer"></div>
+          <div class="form-group"><label>Required Skills (comma separated)</label><input type="text" id="job-skills"
+              placeholder="Python, SQL, JavaScript" required></div>
+          <div class="form-group"><label>Minimum CGPA Required</label><input type="number" id="job-min-cgpa" step="0.01"
+              min="0" max="10" required></div>
+          <div class="form-group"><label>Top N Candidates</label><input type="number" id="job-top-n" value="10" min="1"
+              required></div>
           <button type="submit" class="btn-primary">Post Job</button>
         </form>
       </div>
@@ -47,7 +70,9 @@
       <div class="card">
         <h3>My Posted Jobs</h3>
         <button id="refresh-jobs" class="btn-secondary">Refresh</button>
-        <div id="jobs-list" class="list-container"><p class="loading">Loading your jobs...</p></div>
+        <div id="jobs-list" class="list-container">
+          <p class="loading">Loading your jobs...</p>
+        </div>
       </div>
     </div>
 
@@ -55,10 +80,14 @@
       <div class="card">
         <h3>View Shortlisted Candidates</h3>
         <form id="shortlist-form">
-          <div class="form-group"><label>Select Job</label><select id="shortlist-job-select" required><option value="">Loading jobs...</option></select></div>
+          <div class="form-group"><label>Select Job</label><select id="shortlist-job-select" required>
+              <option value="">Loading jobs...</option>
+            </select></div>
           <button type="submit" class="btn-primary">View Shortlist</button>
         </form>
-        <div id="shortlist-results" class="list-container"><p class="info">Select a job to see shortlisted candidates</p></div>
+        <div id="shortlist-results" class="list-container">
+          <p class="info">Select a job to see shortlisted candidates</p>
+        </div>
       </div>
     </div>
   </div>
@@ -67,4 +96,5 @@
   <script src="js/auth.js"></script>
   <script src="js/company.js"></script>
 </body>
+
 </html>

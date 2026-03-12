@@ -1,13 +1,32 @@
-def score_student_for_job(student, job):
-    student_skills = set([s.strip().lower() for s in student.skills.split(",")])
-    job_reqs = [r.strip().lower() for r in job.requirements.split(",")]
+import re
 
-    matched = student_skills.intersection(job_reqs)
-    missing = set(job_reqs) - student_skills
+def normalize_skill(skill):
+    return re.sub(r'[^a-z0-9]', '', skill.lower())
+
+def score_student_for_job(student, job):
+    student_skills_raw = [s.strip().lower() for s in student.skills.split(",") if s.strip()]
+    job_reqs_raw = [r.strip().lower() for r in job.requirements.split(",") if r.strip()]
+
+    matched = []
+    missing = []
+    
+    student_skills_norm = [normalize_skill(s) for s in student_skills_raw]
+    
+    for req in job_reqs_raw:
+        req_norm = normalize_skill(req)
+        is_match = False
+        for student_norm in student_skills_norm:
+            if req_norm == student_norm or req_norm in student_norm or student_norm in req_norm:
+                is_match = True
+                break
+        if is_match:
+            matched.append(req)
+        else:
+            missing.append(req)
 
     # Calculate percentage match
-    total_requirements = len(job_reqs)
-    skill_match_percentage = (len(matched) / total_requirements * 100) if total_requirements > 0 else 0
+    total_requirements = len(job_reqs_raw)
+    skill_match_percentage = (len(matched) / total_requirements * 100) if total_requirements > 0 else 100
     
     # CGPA eligibility check
     cgpa_eligible = student.cgpa >= job.min_cgpa

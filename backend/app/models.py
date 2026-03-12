@@ -24,6 +24,17 @@ class Job(Base):
     created_by = Column(String, nullable=True)
 
 
+class CompanyProfile(Base):
+    """Company profile details."""
+    __tablename__ = "company_profiles"
+    id = Column(Integer, primary_key=True, index=True)
+    owner_email = Column(String, unique=True, index=True, nullable=False)
+    company_name = Column(String, nullable=False)
+    manager_name = Column(String, nullable=False)
+    designation = Column(String, nullable=False)
+
+
+
 # ---------- Separate auth tables per role ----------
 class AdminUser(Base):
     """Administrator credentials (college placement cell)."""
@@ -95,3 +106,13 @@ class JobApplication(Base):
     applied_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     status = Column(String, default="pending")  # pending, reviewed, accepted, rejected
     match_percentage = Column(Float, nullable=False)
+
+
+class AdminNotification(Base):
+    __tablename__ = "admin_notifications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    admin_email = Column(String, index=True, nullable=True) # None means to all admins
+    message = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    is_read = Column(Boolean, default=False)

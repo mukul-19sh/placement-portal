@@ -1,7 +1,7 @@
 // Fix 4: Single config constant -- change this when deploying
-// Always use Render URL as requested by the user.
-const API_BASE = "https://placement-portal-backend-mukul.onrender.com";
-
+// Temporarily pointing to local backend for testing the fix. Change back to Render for production!
+// const API_BASE = "https://placement-portal-backend-mukul.onrender.com";
+const API_BASE = "http://localhost:8000";
 // Console log for debugging
 console.log('API_BASE:', API_BASE);
 console.log('Protocol:', window.location.protocol);
@@ -52,8 +52,20 @@ const api = {
   studentDashboard: () => authFetch("/student/dashboard"),
   adminAnalytics: () => authFetch("/admin/analytics"),
 
+  // Admin Notifications
+  getAdminNotifications: () => authFetch("/admin/notifications"),
+  markAdminNotificationRead: (id) => authFetch(`/admin/notifications/${id}/read`, { method: "POST" }),
+  markAllAdminNotificationsRead: () => authFetch("/admin/notifications/mark-all-read", { method: "POST" }),
+
   shortlist: (jobId) => authFetch(`/admin/shortlist/${jobId}`),
   companyShortlist: (jobId) => authFetch(`/company/shortlist/${jobId}`),
+
+  // Company profile endpoints
+  getCompanyProfile: () => authFetch("/company/profile"),
+  createOrUpdateCompanyProfile: (data) => authFetch("/company/profile", {
+    method: "POST",
+    body: JSON.stringify(data)
+  }),
 
   // Student profile endpoints
   getStudentProfile: () => authFetch("/student/profile"),
@@ -140,6 +152,15 @@ function handleNetworkError(error) {
   }
   throw error;
 }
+
+api.getFileUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  if (!url.startsWith('/uploads')) {
+    url = '/uploads' + (url.startsWith('/') ? '' : '/') + url;
+  }
+  return API_BASE + url;
+}; // Helper to resolve local/cloud file URLs
 
 // Fix 5: Reusable form validation helpers
 function validateEmail(email) {

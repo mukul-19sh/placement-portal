@@ -11,6 +11,34 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Notification UI Toggle
+  const notifBtn = document.getElementById("notification-btn");
+  const notifDropdown = document.getElementById("notification-dropdown");
+  if (notifBtn && notifDropdown) {
+    notifBtn.addEventListener("click", () => {
+      notifDropdown.classList.toggle("show");
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
+        notifDropdown.classList.remove("show");
+      }
+    });
+  }
+
+  const markAllReadBtn = document.getElementById("mark-all-read");
+  if (markAllReadBtn) {
+    markAllReadBtn.addEventListener("click", async () => {
+      try {
+        await api.markAllAdminNotificationsRead();
+        loadNotifications();
+      } catch (err) {
+        console.error("Failed to mark all as read:", err);
+      }
+    });
+  }
+
   document.getElementById("add-student-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = document.getElementById("student-name").value;
@@ -145,9 +173,56 @@ function renderShortlist(data) {
       <div class="list-item-header"><strong>#${i + 1}. ${r.name}</strong><span class="badge badge-success">Score: ${Number(r.score || 0).toFixed(2)}</span></div>
       <div class="list-item-body">
         CGPA: ${r.cgpa} | Skills: ${r.skills || "N/A"}
-        ${r.resume_url ? ` | <a href="${r.resume_url}" target="_blank" rel="noopener noreferrer">View Resume</a>` : ""}
+        ${r.resume_url ? ` | <a href="${api.getFileUrl(r.resume_url)}" target="_blank" rel="noopener noreferrer">View Resume</a>` : ""}
       </div>
     </div>`).join("");
+}
+
+// -----------------------------------------------------------------------------
+// Notifications
+// -----------------------------------------------------------------------------
+async function loadNotifications() {
+  try {
+    const list = document.getElementById("notifications-list");
+    const countBadge = document.getElementById("notification-count");
+    if (!list || !countBadge) return;
+
+    const notifs = await api.getAdminNotifications();
+    const unreadCount = notifs.filter((n) => !n.is_read).length;
+
+    countBadge.textContent = unreadCount;
+    countBadge.style.display = unreadCount > 0 ? "inline-block" : "none";
+
+    if (notifs.length === 0) {
+      list.innerHTML = '<p class="no-notifications">No new notifications</p>';
+      return;
+    }
+
+    list.innerHTML = notifs
+      .map(
+        (n) => `
+      <div class="notification-item ${n.is_read ? "read" : "unread"}" data-id="${n.id}">
+        <p>${n.message}</p>
+        <small>${new Date(n.created_at).toLocaleString()}</small>
+      </div>
+    `
+      )
+      .join("");
+
+    // Add click handlers
+    document.querySelectorAll(".notification-item.unread").forEach((item) => {
+      item.addEventListener("click", async () => {
+        try {
+          await api.markAdminNotificationRead(item.dataset.id);
+          loadNotifications(); // Reload to update UI
+        } catch (err) {
+          console.error("Failed to mark notification as read:", err);
+        }
+      });
+    });
+  } catch (err) {
+    console.error("Failed to load notifications:", err);
+  }
 }
 
 async function loadAnalytics() {

@@ -8,6 +8,35 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Load Profile on start
+  loadCompanyProfile();
+
+  document.getElementById("company-profile-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const companyName = document.getElementById("profile-company-name").value;
+    const managerName = document.getElementById("profile-manager-name").value;
+    const designation = document.getElementById("profile-designation").value;
+
+    const data = {
+      company_name: companyName,
+      manager_name: managerName,
+      designation: designation
+    };
+
+    const msg = document.getElementById("company-profile-message");
+    try {
+      await api.createOrUpdateCompanyProfile(data);
+      msg.textContent = "Profile saved successfully!";
+      msg.className = "success-message";
+      msg.style.color = "green";
+      setTimeout(() => { msg.textContent = ""; }, 3000);
+      loadStats(); // Update stats if it uses name
+    } catch (err) {
+      msg.textContent = "Error: " + err.message;
+      msg.style.color = "red";
+    }
+  });
+
   document.getElementById("post-job-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const title = document.getElementById("job-title").value;
@@ -100,7 +129,20 @@ function renderShortlist(data) {
       <div class="list-item-header"><strong>#${i + 1}. ${r.name}</strong><span class="badge badge-success">Score: ${Number(r.score || 0).toFixed(2)}</span></div>
       <div class="list-item-body">
         CGPA: ${r.cgpa} | Skills: ${r.skills || "N/A"}
-        ${r.resume_url ? ` | <a href="${r.resume_url}" target="_blank" rel="noopener noreferrer">View Resume</a>` : ""}
+        ${r.resume_url ? ` | <a href="${api.getFileUrl(r.resume_url)}" target="_blank" rel="noopener noreferrer">View Resume</a>` : ""}
       </div>
     </div>`).join("");
+}
+
+async function loadCompanyProfile() {
+  try {
+    const profile = await api.getCompanyProfile();
+    if (profile) {
+      document.getElementById("profile-company-name").value = profile.company_name || "";
+      document.getElementById("profile-manager-name").value = profile.manager_name || "";
+      document.getElementById("profile-designation").value = profile.designation || "";
+    }
+  } catch (err) {
+    console.log("No profile found or error loading profile.");
+  }
 }
