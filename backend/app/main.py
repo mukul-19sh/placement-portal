@@ -1,4 +1,5 @@
 import os
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -9,9 +10,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from .database import Base, engine
 from .routes import students, jobs, auth, admin, company, student, resume, chatbot
 
-Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Base.metadata.create_all(bind=engine) is moved here
+    # This ensures tables are created after the app is initialized
+    Base.metadata.create_all(bind=engine)
+    yield
 
-app = FastAPI(title="Placement Cell Portal API")
+app = FastAPI(title="Placement Cell Portal API", lifespan=lifespan)
 
 # Add CORS middleware FIRST (before anything else)
 app.add_middleware(
