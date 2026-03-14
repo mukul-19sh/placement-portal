@@ -24,6 +24,7 @@ class Job(Base):
     min_cgpa = Column(Float, default=0.0)
     top_n = Column(Integer, default=10)
     created_by = Column(String, nullable=True)
+    vacancies = Column(Integer, default=1)
 
 
 class CompanyProfile(Base):
@@ -34,6 +35,8 @@ class CompanyProfile(Base):
     company_name = Column(String, nullable=False)
     manager_name = Column(String, nullable=False)
     designation = Column(String, nullable=False)
+    experience = Column(String, nullable=True)
+    bio = Column(Text, nullable=True)
 
 
 # ---------- Separate auth tables per role ----------

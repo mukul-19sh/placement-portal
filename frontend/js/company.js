@@ -23,6 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
       company_name: document.getElementById("profile-company-name").value,
       manager_name: document.getElementById("profile-manager-name").value,
       designation: document.getElementById("profile-designation").value,
+      experience: document.getElementById("profile-experience").value,
+      bio: document.getElementById("profile-bio").value,
     };
     const msg = document.getElementById("company-profile-message");
     try {
@@ -44,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const skills = document.getElementById("job-skills").value;
     const cgpa = document.getElementById("job-min-cgpa").value;
     const topN = document.getElementById("job-top-n").value;
+    const vacancies = document.getElementById("job-vacancies").value;
     if (!validateNotEmpty(title)) { showFormError(e.target, "Job title is required."); return; }
     if (!validateNotEmpty(skills)) { showFormError(e.target, "At least one skill is required."); return; }
     if (!validateCGPA(cgpa)) { showFormError(e.target, "CGPA must be between 0 and 10."); return; }
@@ -53,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
         requirements: skills.split(",").map((s) => s.trim()).join(", "),
         min_cgpa: parseFloat(cgpa),
         top_n: parseInt(topN) || 10,
+        vacancies: parseInt(vacancies) || 1,
       });
       alert("Job posted successfully!");
       e.target.reset();
@@ -116,10 +120,11 @@ async function loadMyJobs() {
     if (!jobs.length) { c.innerHTML = '<p class="info">You haven\'t posted any jobs yet.</p>'; return; }
     c.innerHTML = jobs.map((j) => `
       <div class="list-item">
-        <div class="list-item-header"><strong>${j.title}</strong><span class="badge">Min CGPA: ${j.min_cgpa}</span></div>
+        <div class="list-item-header"><strong>${j.title}</strong><span class="badge">Vacancies: ${j.vacancies || 1}</span><span class="badge">Min CGPA: ${j.min_cgpa}</span></div>
         <div class="list-item-body">Requirements: ${j.requirements || "N/A"}</div>
         <div class="list-item-footer">
           <button class="btn-primary btn-sm" onclick="viewApplicantsForJob(${j.id}, '${j.title.replace(/'/g, "\\'")}')">View Applicants</button>
+          <button class="btn-secondary btn-sm" onclick="deleteJob(${j.id})" style="background:#dc3545;">Delete Job</button>
         </div>
       </div>`).join("");
   } catch (e) { c.innerHTML = `<p class="error">Error: ${e.message}</p>`; }
@@ -316,6 +321,8 @@ async function loadCompanyProfile() {
       document.getElementById("profile-company-name").value = profile.company_name || "";
       document.getElementById("profile-manager-name").value = profile.manager_name || "";
       document.getElementById("profile-designation").value = profile.designation || "";
+      document.getElementById("profile-experience").value = profile.experience || "";
+      document.getElementById("profile-bio").value = profile.bio || "";
     }
   } catch (err) { console.log("No profile found or error loading profile."); }
 }

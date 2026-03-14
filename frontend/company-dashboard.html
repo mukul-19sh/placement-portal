@@ -215,6 +215,8 @@
               min="0" max="10" required></div>
           <div class="form-group"><label>Top N Candidates</label><input type="number" id="job-top-n" value="10" min="1"
               required></div>
+          <div class="form-group"><label>Vacancies (Seats Available)</label><input type="number" id="job-vacancies" value="1" min="1"
+              required placeholder="e.g., 50"></div>
           <button type="submit" class="btn-primary">Post Job</button>
         </form>
       </div>
@@ -299,6 +301,10 @@
               placeholder="e.g., John Doe"></div>
           <div class="form-group"><label>Designation</label><input type="text" id="profile-designation" required
               placeholder="e.g., CEO, HR Manager"></div>
+          <div class="form-group"><label>Experience</label><input type="text" id="profile-experience"
+              placeholder="e.g., 10+ years in Tech Recruitment"></div>
+          <div class="form-group"><label>Professional Bio / Description</label><textarea id="profile-bio" rows="4"
+              placeholder="Tell us about yourself and your role..."></textarea></div>
           <button type="submit" class="btn-primary">Save Profile</button>
         </form>
         <div id="company-profile-message" style="margin-top:10px; font-weight:bold;"></div>

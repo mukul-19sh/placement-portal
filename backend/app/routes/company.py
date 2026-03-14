@@ -85,17 +85,37 @@ def create_or_update_company_profile(
         profile.company_name = profile_data.company_name
         profile.manager_name = profile_data.manager_name
         profile.designation = profile_data.designation
+        profile.experience = profile_data.experience
+        profile.bio = profile_data.bio
     else:
         profile = CompanyProfile(
             owner_email=company.email,
             company_name=profile_data.company_name,
             manager_name=profile_data.manager_name,
-            designation=profile_data.designation
+            designation=profile_data.designation,
+            experience=profile_data.experience,
+            bio=profile_data.bio
         )
         db.add(profile)
     db.commit()
     db.refresh(profile)
     return profile
+
+
+@router.delete("/jobs/{job_id}")
+def delete_job(
+    job_id: int,
+    company=Depends(company_required),
+    db: Session = Depends(get_db)
+):
+    """Delete a job posted by this company."""
+    job = db.query(Job).filter(Job.id == job_id, Job.created_by == company.email).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found or not owned by you")
+
+    db.delete(job)
+    db.commit()
+    return {"message": "Job deleted successfully"}
 
 
 # ---------- Applicant Management ----------

@@ -24,6 +24,7 @@ class JobCreate(BaseModel):
     requirements: str
     min_cgpa: float
     top_n: int
+    vacancies: int = 1
 
 # ---------- Auth / Users ----------
 class UserCreate(BaseModel):
@@ -40,6 +41,8 @@ class CompanyProfileBase(BaseModel):
     company_name: str
     manager_name: str
     designation: str
+    experience: Optional[str] = None
+    bio: Optional[str] = None
 
 class CompanyProfileCreate(CompanyProfileBase):
     pass

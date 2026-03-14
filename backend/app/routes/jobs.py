@@ -52,13 +52,13 @@ def add_job(
             # Add In-App Notification
             db.add(Notification(
                 student_email=s.email,
-                message=f"{company_name} opened {new_job.title} vacancies"
+                message=f"{company_name} opened {new_job.vacancies} vacancies for {new_job.title}"
             ))
 
     # Notify admins about the new job
     db.add(AdminNotification(
         admin_email=None, # Global admin notification
-        message=f"{company_name} opened {new_job.title} vacancies"
+        message=f"{company_name} opened {new_job.vacancies} vacancies for {new_job.title}"
     ))
 
     db.commit()

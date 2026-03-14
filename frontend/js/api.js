@@ -118,6 +118,7 @@ const api = {
 
   // Company – student browser
   getAllStudents: () => authFetch("/company/students"),
+  deleteJob: (jobId) => authFetch(`/company/jobs/${jobId}`, { method: "DELETE" }),
 
   // Resume Chatbot
   chatWithBot: (question) => authFetch("/chatbot/chat", {
