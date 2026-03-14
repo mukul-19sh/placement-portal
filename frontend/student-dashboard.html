@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Dashboard - Placement Portal</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
   <nav class="navbar">
     <div class="nav-content">
@@ -50,9 +52,16 @@
           <h3>Create / Update Profile</h3>
           <div id="profile-completion" class="profile-completion"></div>
           <form id="profile-form">
-            <div class="form-group"><label>Full Name</label><input type="text" id="profile-name" required placeholder="Your full name"></div>
-            <div class="form-group"><label>Skills (comma separated)</label><input type="text" id="profile-skills" placeholder="Python, SQL, ML, Java" required></div>
-            <div class="form-group"><label>CGPA</label><input type="number" id="profile-cgpa" step="0.01" min="0" max="10" required placeholder="e.g., 8.5"></div>
+            <div class="form-group"><label>Full Name</label><input type="text" id="profile-name" required
+                placeholder="Your full name"></div>
+            <div class="form-group"><label>Skills (comma separated)</label><input type="text" id="profile-skills"
+                placeholder="Python, SQL, ML, Java" required></div>
+            <div class="form-group"><label>CGPA</label><input type="number" id="profile-cgpa" step="0.01" min="0"
+                max="10" required placeholder="e.g., 8.5"></div>
+            <div class="form-group"><label>🔗 LinkedIn Profile URL</label><input type="url" id="profile-linkedin"
+                placeholder="https://linkedin.com/in/yourname"></div>
+            <div class="form-group"><label>🐙 GitHub Profile URL</label><input type="url" id="profile-github"
+                placeholder="https://github.com/yourusername"></div>
             <button type="submit" class="btn-primary">Save Profile</button>
           </form>
           <div id="profile-message"></div>
@@ -79,7 +88,9 @@
       <div class="card">
         <h3>Jobs Matching Your Profile (70%+)</h3>
         <button id="refresh-matched-jobs" class="btn-secondary">Refresh</button>
-        <div id="matched-jobs-list" class="list-container"><p class="loading">Loading matched jobs...</p></div>
+        <div id="matched-jobs-list" class="list-container">
+          <p class="loading">Loading matched jobs...</p>
+        </div>
       </div>
     </div>
 
@@ -87,7 +98,7 @@
       <div class="card">
         <h3>🤖 Resume Assistant</h3>
         <p>Chat with our AI assistant to improve your resume and profile!</p>
-        
+
         <div class="chatbot-container">
           <div class="chatbot-upload">
             <div class="form-group">
@@ -96,7 +107,7 @@
               <button id="analyze-resume-btn" class="btn-secondary btn-sm">Analyze Resume</button>
             </div>
           </div>
-          
+
           <div class="chatbot-messages" id="chatbot-messages">
             <div class="chatbot-welcome">
               <div class="bot-message">
@@ -111,17 +122,21 @@
               </div>
             </div>
           </div>
-          
+
           <div class="chatbot-input">
             <div class="input-group">
-              <input type="text" id="chatbot-question" placeholder="Ask about your resume, skills, or profile..." maxlength="500">
+              <input type="text" id="chatbot-question" placeholder="Ask about your resume, skills, or profile..."
+                maxlength="500">
               <button id="send-chatbot-btn" class="btn-primary">Send</button>
             </div>
             <div class="quick-questions">
               <p>Quick Questions:</p>
-              <button class="quick-question-btn" data-question="What skills should I add to my resume?">💡 What skills should I add?</button>
-              <button class="quick-question-btn" data-question="How can I improve my resume?">📈 How can I improve my resume?</button>
-              <button class="quick-question-btn" data-question="Is my profile complete?">📋 Is my profile complete?</button>
+              <button class="quick-question-btn" data-question="What skills should I add to my resume?">💡 What skills
+                should I add?</button>
+              <button class="quick-question-btn" data-question="How can I improve my resume?">📈 How can I improve my
+                resume?</button>
+              <button class="quick-question-btn" data-question="Is my profile complete?">📋 Is my profile
+                complete?</button>
             </div>
           </div>
         </div>
@@ -132,7 +147,9 @@
       <div class="card">
         <h3>My Job Applications</h3>
         <button id="refresh-applications" class="btn-secondary">Refresh</button>
-        <div id="applications-list" class="list-container"><p class="loading">Loading applications...</p></div>
+        <div id="applications-list" class="list-container">
+          <p class="loading">Loading applications...</p>
+        </div>
       </div>
     </div>
 
@@ -140,7 +157,9 @@
       <div class="card">
         <h3>Available Job Positions</h3>
         <button id="refresh-jobs" class="btn-secondary">Refresh</button>
-        <div id="jobs-list" class="list-container"><p class="loading">Loading jobs...</p></div>
+        <div id="jobs-list" class="list-container">
+          <p class="loading">Loading jobs...</p>
+        </div>
       </div>
     </div>
   </div>
@@ -149,4 +168,5 @@
   <script src="js/auth.js"></script>
   <script src="js/student.js"></script>
 </body>
+
 </html>

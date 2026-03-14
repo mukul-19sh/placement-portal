@@ -12,6 +12,8 @@ class Student(Base):
     cgpa = Column(Float, nullable=False)
     resume_url = Column(String, nullable=True)
     owner_email = Column(String, nullable=True, index=True)
+    linkedin_url = Column(String, nullable=True)
+    github_url = Column(String, nullable=True)
 
 
 class Job(Base):

@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.add("active");
       document.getElementById(`${btn.dataset.tab}-tab`).classList.add("active");
       if (btn.dataset.tab === "applicants") loadJobsForApplicants();
+      if (btn.dataset.tab === "student-browser") loadAllStudents();
     });
   });
 
@@ -85,6 +86,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("refresh-jobs").addEventListener("click", loadMyJobs);
+
+  // Student Browser – refresh + search + filter
+  document.getElementById("refresh-students").addEventListener("click", loadAllStudents);
+  document.getElementById("student-search").addEventListener("input", filterStudents);
+  document.getElementById("student-cgpa-filter").addEventListener("change", filterStudents);
 });
 
 // ─── Stats ───────────────────────────────────────────────────────────────────
@@ -189,6 +195,10 @@ async function loadApplicants(jobId) {
               Match: <strong>${a.match_percentage}%</strong> &nbsp;|&nbsp;
               Skills: ${a.student_skills || "N/A"}
               ${a.resume_url ? ` &nbsp;|&nbsp; <a href="${api.getFileUrl(a.resume_url)}" target="_blank">📄 Resume</a>` : ""}
+            </div>
+            <div style="margin-bottom:8px;display:flex;gap:8px;flex-wrap:wrap;">
+              ${a.linkedin_url ? `<a href="${a.linkedin_url}" target="_blank" class="social-link linkedin-link">🔗 LinkedIn</a>` : ""}
+              ${a.github_url ? `<a href="${a.github_url}" target="_blank" class="social-link github-link">🐙 GitHub</a>` : ""}
             </div>
             ${interviewHtml}
             ${offerHtml}
@@ -308,4 +318,76 @@ async function loadCompanyProfile() {
       document.getElementById("profile-designation").value = profile.designation || "";
     }
   } catch (err) { console.log("No profile found or error loading profile."); }
+}
+
+// ─── Student Browser ──────────────────────────────────────────────────────────
+let allStudentsCache = [];
+
+async function loadAllStudents() {
+  const c = document.getElementById("student-browser-list");
+  c.innerHTML = '<p class="loading">Loading students...</p>';
+  try {
+    const students = await api.getAllStudents();
+    allStudentsCache = students;
+    renderStudentCards(students);
+  } catch (e) {
+    c.innerHTML = `<p class="error">Error: ${e.message}</p>`;
+  }
+}
+
+function renderStudentCards(students) {
+  const c = document.getElementById("student-browser-list");
+  if (!students.length) {
+    c.innerHTML = '<p class="info">No students registered yet.</p>';
+    return;
+  }
+
+  c.innerHTML = students.map((s) => {
+    const skills = (s.skills || "").split(",").map(sk => sk.trim()).filter(Boolean);
+    const skillTags = skills.slice(0, 6).map(sk => `<span class="skill-tag">${sk}</span>`).join("") +
+      (skills.length > 6 ? `<span class="skill-tag" style="background:#e9ecef;color:#666;">+${skills.length - 6} more</span>` : "");
+
+    const linkedinBtn = s.linkedin_url
+      ? `<a href="${s.linkedin_url}" target="_blank" rel="noopener noreferrer" class="social-link linkedin-link">🔗 LinkedIn</a>`
+      : `<span class="social-link-empty" title="Not provided">🔗 LinkedIn</span>`;
+    const githubBtn = s.github_url
+      ? `<a href="${s.github_url}" target="_blank" rel="noopener noreferrer" class="social-link github-link">🐙 GitHub</a>`
+      : `<span class="social-link-empty" title="Not provided">🐙 GitHub</span>`;
+    const resumeBtn = s.resume_url
+      ? `<a href="${api.getFileUrl(s.resume_url)}" target="_blank" rel="noopener noreferrer" class="social-link resume-link">📄 Resume</a>`
+      : "";
+
+    return `
+      <div class="student-browser-card">
+        <div class="student-card-header">
+          <div>
+            <div class="student-card-name">${s.name || "Unknown"}</div>
+            <div class="student-card-email">${s.email || ""}</div>
+          </div>
+          <div class="student-card-cgpa">
+            <span class="cgpa-badge">CGPA ${s.cgpa}</span>
+          </div>
+        </div>
+        <div class="student-card-skills">${skillTags || '<span style="color:#999;font-size:13px;">No skills listed</span>'}</div>
+        <div class="student-card-links">
+          ${linkedinBtn}
+          ${githubBtn}
+          ${resumeBtn}
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function filterStudents() {
+  const query = (document.getElementById("student-search").value || "").toLowerCase().trim();
+  const minCgpa = parseFloat(document.getElementById("student-cgpa-filter").value) || 0;
+
+  const filtered = allStudentsCache.filter((s) => {
+    const nameMatch = (s.name || "").toLowerCase().includes(query);
+    const skillMatch = (s.skills || "").toLowerCase().includes(query);
+    const cgpaMatch = (s.cgpa || 0) >= minCgpa;
+    return (nameMatch || skillMatch || !query) && cgpaMatch;
+  });
+
+  renderStudentCards(filtered);
 }

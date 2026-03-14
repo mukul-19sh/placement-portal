@@ -45,6 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const name = document.getElementById("profile-name").value;
     const skills = document.getElementById("profile-skills").value;
     const cgpa = document.getElementById("profile-cgpa").value;
+    const linkedin = document.getElementById("profile-linkedin").value.trim();
+    const github = document.getElementById("profile-github").value.trim();
 
     if (!validateNotEmpty(name)) { showFormError(e.target, "Name is required."); return; }
     if (!validateNotEmpty(skills)) { showFormError(e.target, "At least one skill is required."); return; }
@@ -54,6 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
       full_name: name,
       skills: skills.split(",").map((s) => s.trim()).join(", "),
       cgpa: parseFloat(cgpa),
+      linkedin_url: linkedin || null,
+      github_url: github || null,
     };
     const msg = document.getElementById("profile-message");
     try {
@@ -67,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("student_profile_id", res.profile.id);
       }
       loadStats();
-      loadProfilePreview({ name: data.full_name, skills: data.skills, cgpa: data.cgpa });
+      loadProfilePreview({ name: data.full_name, skills: data.skills, cgpa: data.cgpa, linkedin_url: data.linkedin_url, github_url: data.github_url });
       updateProfileCompletion({ profile_completion: calculateProfileCompletion(res.profile) });
     } catch (err) {
       msg.textContent = "Error: " + err.message;
@@ -127,12 +131,14 @@ function calculateProfileCompletion(profile) {
   if (!profile) return 0;
 
   let completion = 0;
-  const totalFields = 4; // name, skills, cgpa, resume
+  const totalFields = 6; // name, skills, cgpa, resume, linkedin, github
 
   if (profile.name && profile.name.trim()) completion += 1;
   if (profile.skills && profile.skills.trim()) completion += 1;
   if (profile.cgpa && profile.cgpa > 0) completion += 1;
   if (profile.resume_url && profile.resume_url.trim()) completion += 1;
+  if (profile.linkedin_url && profile.linkedin_url.trim()) completion += 1;
+  if (profile.github_url && profile.github_url.trim()) completion += 1;
 
   return Math.round((completion / totalFields) * 100);
 }
@@ -308,6 +314,12 @@ async function loadProfile() {
       }
       if (profile.cgpa) {
         document.getElementById("profile-cgpa").value = profile.cgpa;
+      }
+      if (profile.linkedin_url) {
+        document.getElementById("profile-linkedin").value = profile.linkedin_url;
+      }
+      if (profile.github_url) {
+        document.getElementById("profile-github").value = profile.github_url;
       }
 
       loadProfilePreview(profile);
@@ -577,11 +589,19 @@ async function markAllNotificationsRead() {
 function loadProfilePreview(data) {
   const el = document.getElementById("profile-preview");
   if (!el) return;
-  const skills = data.skills.split(",").map((s) => s.trim()).filter(Boolean);
+  const name = data.full_name || data.name || "";
+  const skills = (data.skills || "").split(",").map((s) => s.trim()).filter(Boolean);
+  const linkedinHtml = data.linkedin_url
+    ? `<a href="${data.linkedin_url}" target="_blank" class="social-link linkedin-link" title="LinkedIn Profile">🔗 LinkedIn</a>`
+    : `<span class="social-link-empty">LinkedIn not added</span>`;
+  const githubHtml = data.github_url
+    ? `<a href="${data.github_url}" target="_blank" class="social-link github-link" title="GitHub Profile">🐙 GitHub</a>`
+    : `<span class="social-link-empty">GitHub not added</span>`;
   el.innerHTML = `
     <div class="profile-card">
-      <h3>${data.name}</h3>
+      <h3>${name}</h3>
       <div class="profile-detail">CGPA: ${data.cgpa}</div>
+      <div class="profile-social">${linkedinHtml} ${githubHtml}</div>
       <div class="profile-skills">${skills.map((s) => `<span class="skill-tag">${s}</span>`).join("")}</div>
     </div>
   `;

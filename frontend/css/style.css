@@ -990,3 +990,114 @@ body {
     align-items: flex-start;
   }
 }
+
+/* ─── Social Links (LinkedIn / GitHub / Resume) ────────────────────────────── */
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.social-link:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.linkedin-link {
+  background: #0a66c2;
+  color: #fff !important;
+}
+
+.github-link {
+  background: #24292e;
+  color: #fff !important;
+}
+
+.resume-link {
+  background: #28a745;
+  color: #fff !important;
+}
+
+.social-link-empty {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #f0f0f0;
+  color: #aaa;
+  cursor: default;
+}
+
+/* Profile card social row */
+.profile-social {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+
+/* ─── Student Browser Cards ────────────────────────────────────────────────── */
+.student-browser-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 10px 0;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s;
+}
+
+.student-browser-card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.student-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.student-card-name {
+  font-weight: 700;
+  font-size: 16px;
+  color: #111;
+}
+
+.student-card-email {
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.cgpa-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #e3f2fd;
+  color: #1565c0;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.student-card-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.student-card-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}

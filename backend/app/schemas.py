@@ -12,6 +12,8 @@ class StudentProfile(BaseModel):
     full_name: str
     skills: str
     cgpa: float
+    linkedin_url: Optional[str] = None
+    github_url: Optional[str] = None
 
 class StudentBulkCreate(BaseModel):
     students: List[StudentCreate]

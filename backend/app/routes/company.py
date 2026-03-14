@@ -149,6 +149,8 @@ def get_job_applicants(
             "student_skills": student.skills,
             "student_cgpa": student.cgpa,
             "resume_url": student.resume_url,
+            "linkedin_url": getattr(student, 'linkedin_url', None),
+            "github_url": getattr(student, 'github_url', None),
             "match_percentage": app.match_percentage,
             "status": app.status,
             "applied_at": app.applied_at.isoformat(),
@@ -420,8 +422,33 @@ def get_student_profile(
     return {
         "id": student.id,
         "name": student.name,
+        "email": student.owner_email,
         "skills": student.skills,
         "cgpa": student.cgpa,
         "resume_url": student.resume_url,
+        "linkedin_url": getattr(student, 'linkedin_url', None),
+        "github_url": getattr(student, 'github_url', None),
         "has_resume": bool(student.resume_url)
     }
+
+
+@router.get("/students")
+def get_all_students(
+    company=Depends(company_required),
+    db: Session = Depends(get_db)
+):
+    """Return all student profiles for browsing by company / admin."""
+    students = db.query(Student).all()
+    return [
+        {
+            "id": s.id,
+            "name": s.name,
+            "email": s.owner_email,
+            "skills": s.skills,
+            "cgpa": s.cgpa,
+            "resume_url": s.resume_url,
+            "linkedin_url": getattr(s, 'linkedin_url', None),
+            "github_url": getattr(s, 'github_url', None),
+        }
+        for s in students
+    ]

@@ -36,7 +36,7 @@ def calculate_profile_completion(profile):
         return 0
     
     completion = 0
-    total_fields = 4  # name, skills, cgpa, resume
+    total_fields = 6  # name, skills, cgpa, resume, linkedin, github
     
     if profile.name and profile.name.strip():
         completion += 1
@@ -45,6 +45,10 @@ def calculate_profile_completion(profile):
     if profile.cgpa is not None and profile.cgpa > 0:
         completion += 1
     if profile.resume_url and profile.resume_url.strip():
+        completion += 1
+    if getattr(profile, 'linkedin_url', None) and profile.linkedin_url.strip():
+        completion += 1
+    if getattr(profile, 'github_url', None) and profile.github_url.strip():
         completion += 1
     
     return round((completion / total_fields) * 100)
@@ -68,6 +72,8 @@ def get_profile(student=Depends(student_required), db: Session = Depends(get_db)
         "skills": profile.skills,
         "cgpa": profile.cgpa,
         "resume_url": profile.resume_url,
+        "linkedin_url": profile.linkedin_url,
+        "github_url": profile.github_url,
         "profile_completion": completion_percentage,
         "completion_status": get_completion_status(completion_percentage)
     }
@@ -103,6 +109,8 @@ def create_or_update_student_profile(
         existing_profile.name = profile.full_name
         existing_profile.skills = profile.skills
         existing_profile.cgpa = profile.cgpa
+        existing_profile.linkedin_url = profile.linkedin_url
+        existing_profile.github_url = profile.github_url
         db.commit()
         db.refresh(existing_profile)
         
@@ -117,7 +125,9 @@ def create_or_update_student_profile(
             name=profile.full_name,
             skills=profile.skills,
             cgpa=profile.cgpa,
-            owner_email=student.email
+            owner_email=student.email,
+            linkedin_url=profile.linkedin_url,
+            github_url=profile.github_url
         )
         db.add(new_profile)
         db.commit()

@@ -1,7 +1,7 @@
 // Fix 4: Single config constant -- change this when deploying
 // Temporarily pointing to local backend for testing the fix. Change back to Render for production!
-// const API_BASE = "https://placement-portal-backend-mukul.onrender.com";
-const API_BASE = "http://localhost:8000";
+const API_BASE = "https://placement-portal-backend-mukul.onrender.com";
+// const API_BASE = "http://localhost:8000";
 // Console log for debugging
 console.log('API_BASE:', API_BASE);
 console.log('Protocol:', window.location.protocol);
@@ -115,6 +115,9 @@ const api = {
     method: "POST",
     body: JSON.stringify(data)
   }),
+
+  // Company – student browser
+  getAllStudents: () => authFetch("/company/students"),
 
   // Resume Chatbot
   chatWithBot: (question) => authFetch("/chatbot/chat", {
