@@ -20,6 +20,12 @@ services:
           name: placement-db
           property: connectionString
 
+  - type: static
+    name: placement-portal-frontend
+    rootDir: frontend
+    buildCommand: echo "Deploying frontend..."
+    publishDir: .
+
 databases:
   - name: placement-db
     databaseName: placement_db
